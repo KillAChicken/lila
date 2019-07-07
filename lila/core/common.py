@@ -9,7 +9,10 @@ def adjust_classes(classes):
     :param classes: iterable with classes.
     :returns: tuple with string names.
     """
-    return tuple(str(class_) for class_ in classes)
+    try:
+        return tuple(str(class_) for class_ in classes)
+    except TypeError as error:
+        raise ValueError("Classes must be iterable with string values") from error
 
 
 def adjust_properties(properties):
@@ -29,9 +32,9 @@ def adjust_properties(properties):
         # ensure that value is a valid JSON object by dumping and loading it.
         try:
             adjusted_value = json.loads(json.dumps(value))
-        except Exception:
+        except TypeError as error:
             error_message = "Unsupported value for property '{name}'".format(name=adjusted_name)
-            raise ValueError(error_message)
+            raise ValueError(error_message) from error
 
         adjusted_properties[adjusted_name] = adjusted_value
 
