@@ -44,7 +44,7 @@ def test_default_classes():
 @pytest.mark.parametrize(
     argnames="classes, expected_classes",
     argvalues=[
-        (["class1", "class2"], ("class1", "class2")),
+        (["field-class1", "field-class2"], ("field-class1", "field-class2")),
     ],
     ids=[
         "Happy path",
