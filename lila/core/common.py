@@ -15,14 +15,14 @@ def adjust_classes(classes):
         raise ValueError("Classes must be iterable with string values") from error
 
 
-def adjust_relationships(relationships):
-    """Adjust relationships to Siren protocol.
+def adjust_relations(relations):
+    """Adjust relations to Siren protocol.
 
-    :param relationships: iterable with relationships.
-    :returns: tuple with string relationships.
+    :param relations: iterable with relations.
+    :returns: tuple with string relations.
     """
     try:
-        return tuple(str(relationship) for relationship in relationships)
+        return tuple(str(relation) for relation in relations)
     except TypeError as error:
         raise ValueError("Relationships must be iterable with string values") from error
 
