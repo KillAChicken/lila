@@ -54,7 +54,7 @@ def test_invalid_relations():
     ],
 )
 def test_target(target, expected_target):
-    """Check target of the link.
+    """Check target of a link.
 
     1. Create a link with a target.
     2. Get target.
@@ -68,7 +68,7 @@ def test_default_classes():
     """Check default classes of a link.
 
     1. Create a link without specifying classes.
-    2. Check classes of the field.
+    2. Check classes of the link.
     """
     link = Link(relations=DEFAULT_RELATIONS, target="#")
     assert link.classes == (), "Wrong classes"
