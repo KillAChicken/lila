@@ -44,3 +44,21 @@ class Link:
     def target_media_type(self):
         """Media type of the target resource."""
         return self._target_media_type
+
+
+class EmbeddedLink(Link):
+    """Class to work with embedded Siren links."""
+
+    def __init__(self, relations, target, classes=(), title=None, target_media_type=None):
+        # pylint: disable=too-many-arguments
+        relations = common.adjust_relations(relations)
+        if not relations:
+            raise ValueError("No relations are passed to create an embedded link")
+
+        super(EmbeddedLink, self).__init__(
+            relations=relations,
+            target=target,
+            classes=classes,
+            title=title,
+            target_media_type=target_media_type,
+            )
