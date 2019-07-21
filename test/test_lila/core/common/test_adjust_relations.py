@@ -28,4 +28,4 @@ def test_invalid_relations():
     with pytest.raises(ValueError) as error_info:
         adjust_relations(None)
 
-    assert error_info.value.args[0] == "Relationships must be iterable with string values"
+    assert error_info.value.args[0] == "Relations must be iterable with string values"

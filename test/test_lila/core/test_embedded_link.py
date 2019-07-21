@@ -48,7 +48,9 @@ def test_missing_relations():
     with pytest.raises(ValueError) as error_info:
         EmbeddedLink(relations=[], target="#")
 
-    assert error_info.value.args[0] == "No relations are passed to create an embedded link"
+    assert error_info.value.args[0] == "No relations are passed to create an embedded link", (
+        "Wrong error message"
+        )
 
 
 @pytest.mark.parametrize(

@@ -8,6 +8,7 @@ def adjust_classes(classes):
 
     :param classes: iterable with classes.
     :returns: tuple with string names.
+    :raises: :class:ValueError.
     """
     try:
         return tuple(str(class_) for class_ in classes)
@@ -20,11 +21,12 @@ def adjust_relations(relations):
 
     :param relations: iterable with relations.
     :returns: tuple with string relations.
+    :raises: :class:ValueError.
     """
     try:
         return tuple(str(relation) for relation in relations)
     except TypeError as error:
-        raise ValueError("Relationships must be iterable with string values") from error
+        raise ValueError("Relations must be iterable with string values") from error
 
 
 def adjust_properties(properties):
@@ -32,6 +34,7 @@ def adjust_properties(properties):
 
     :param properties: dictionary or iterable with dictionary items.
     :returns: dictionary with strings as values (property names) and json serializable values.
+    :raises: :class:ValueError.
     """
     try:
         properties_dictionary = dict(properties)
