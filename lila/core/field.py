@@ -2,7 +2,7 @@
 
 import enum
 
-import lila.core.common as common
+from lila.core.base import Component
 
 
 class InputType(enum.Enum):
@@ -31,13 +31,14 @@ class InputType(enum.Enum):
     BUTTON = "button"
 
 
-class Field:
+class Field(Component):
     """Class to work with Siren fields."""
 
     def __init__(self, name, classes=(), input_type=InputType.TEXT, value=None, title=None):
         # pylint: disable=too-many-arguments
+        super(Field, self).__init__(classes=classes)
+
         self._name = str(name)
-        self._classes = common.adjust_classes(classes)
 
         if not isinstance(input_type, InputType):
             raise ValueError("Unsupported input type '{0}'".format(input_type))
@@ -55,11 +56,6 @@ class Field:
     def name(self):
         """Name of the field."""
         return self._name
-
-    @property
-    def classes(self):
-        """Classes of the field."""
-        return tuple(self._classes)
 
     @property
     def input_type(self):

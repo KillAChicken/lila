@@ -90,16 +90,6 @@ def test_default_title():
     assert representation.title is None, "Wrong title"
 
 
-def test_default_classes():
-    """Check default classes of an embedded representation.
-
-    1. Create an embedded representation without specifying classes.
-    2. Check classes of the representation.
-    """
-    representation = EmbeddedRepresentation(relations=DEFAULT_RELATIONS)
-    assert representation.classes == (), "Wrong classes"
-
-
 @pytest.mark.parametrize(
     argnames="classes, expected_classes",
     argvalues=[
@@ -120,6 +110,16 @@ def test_classes(classes, expected_classes):
     """
     representation = EmbeddedRepresentation(relations=DEFAULT_RELATIONS, classes=classes)
     assert representation.classes == expected_classes, "Wrong classes"
+
+
+def test_default_classes():
+    """Check default classes of an embedded representation.
+
+    1. Create an embedded representation without specifying classes.
+    2. Check classes of the representation.
+    """
+    representation = EmbeddedRepresentation(relations=DEFAULT_RELATIONS)
+    assert representation.classes == (), "Wrong classes"
 
 
 def test_invalid_classes():

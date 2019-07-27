@@ -3,20 +3,22 @@
 from copy import deepcopy
 
 import lila.core.common as common
+from lila.core.base import Component
 from lila.core.link import Link, EmbeddedLink
 from lila.core.action import Action
 
 
-class Entity:
+class Entity(Component):
     """Class to work with Siren entities."""
 
     def __init__(self, title=None, classes=(), properties=(), entities=(), links=(), actions=()):
         # pylint: disable=too-many-arguments
+        super(Entity, self).__init__(classes=classes)
+
         if title is not None:
             title = str(title)
         self._title = title
 
-        self._classes = common.adjust_classes(classes)
         self._properties = common.adjust_properties(properties)
 
         if any(not isinstance(link, Link) for link in links):
@@ -35,11 +37,6 @@ class Entity:
     def title(self):
         """Descriptive text about the entity."""
         return self._title
-
-    @property
-    def classes(self):
-        """Classes of the entity."""
-        return tuple(self._classes)
 
     @property
     def properties(self):

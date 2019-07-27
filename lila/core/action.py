@@ -1,10 +1,10 @@
 """Module to work with Siren actions."""
 
-import lila.core.common as common
+from lila.core.base import Component
 from lila.core.field import Field
 
 
-class Action:
+class Action(Component):
     """Class to work with Siren actions."""
     _SUPPORTED_METHODS = set(("GET", "PUT", "POST", "DELETE", "PATCH"))
 
@@ -19,10 +19,10 @@ class Action:
             encoding_type=None,
         ):
         # pylint: disable=too-many-arguments
+        super(Action, self).__init__(classes=classes)
+
         self._name = str(name)
         self._target = str(target)
-
-        self._classes = common.adjust_classes(classes)
 
         if method not in self._SUPPORTED_METHODS:
             raise ValueError("Method '{0}' is not supported".format(method))
@@ -51,11 +51,6 @@ class Action:
     def target(self):
         """Request target of the action."""
         return self._target
-
-    @property
-    def classes(self):
-        """Classes of the action."""
-        return tuple(self._classes)
 
     @property
     def method(self):

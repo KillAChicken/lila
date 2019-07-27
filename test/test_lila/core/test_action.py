@@ -54,16 +54,6 @@ def test_target(target, expected_target):
     assert action.target == expected_target, "Wrong target"
 
 
-def test_default_classes():
-    """Check default classes of an action.
-
-    1. Create an action without specifying classes.
-    2. Check classes of the action.
-    """
-    action = Action(name="test default classes", target="/test-default-clases")
-    assert action.classes == (), "Wrong classes"
-
-
 @pytest.mark.parametrize(
     argnames="classes, expected_classes",
     argvalues=[
@@ -82,6 +72,16 @@ def test_classes(classes, expected_classes):
     """
     action = Action(name="test action classes", target="/test-action-classes", classes=classes)
     assert action.classes == expected_classes, "Wrong classes"
+
+
+def test_default_classes():
+    """Check default classes of an action.
+
+    1. Create an action without specifying classes.
+    2. Check classes of the action.
+    """
+    action = Action(name="test default classes", target="/test-default-clases")
+    assert action.classes == (), "Wrong classes"
 
 
 def test_invalid_classes():

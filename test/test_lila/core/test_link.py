@@ -66,16 +66,6 @@ def test_target(target, expected_target):
     assert link.target == expected_target, "Wrong target"
 
 
-def test_default_classes():
-    """Check default classes of a link.
-
-    1. Create a link without specifying classes.
-    2. Check classes of the link.
-    """
-    link = Link(relations=DEFAULT_RELATIONS, target="#")
-    assert link.classes == (), "Wrong classes"
-
-
 @pytest.mark.parametrize(
     argnames="classes, expected_classes",
     argvalues=[
@@ -96,6 +86,16 @@ def test_classes(classes, expected_classes):
     """
     link = Link(relations=DEFAULT_RELATIONS, target="#", classes=classes)
     assert link.classes == expected_classes, "Wrong classes"
+
+
+def test_default_classes():
+    """Check default classes of a link.
+
+    1. Create a link without specifying classes.
+    2. Check classes of the link.
+    """
+    link = Link(relations=DEFAULT_RELATIONS, target="#")
+    assert link.classes == (), "Wrong classes"
 
 
 def test_invalid_classes():

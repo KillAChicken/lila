@@ -41,16 +41,6 @@ def test_default_title():
     assert entity.title is None, "Wrong title"
 
 
-def test_default_classes():
-    """Check default classes of an entity.
-
-    1. Create an entity without specifying classes.
-    2. Check classes of the entity.
-    """
-    entity = Entity()
-    assert entity.classes == (), "Wrong classes"
-
-
 @pytest.mark.parametrize(
     argnames="classes, expected_classes",
     argvalues=[
@@ -71,6 +61,16 @@ def test_classes(classes, expected_classes):
     """
     entity = Entity(classes=classes)
     assert entity.classes == expected_classes, "Wrong classes"
+
+
+def test_default_classes():
+    """Check default classes of an entity.
+
+    1. Create an entity without specifying classes.
+    2. Check classes of the entity.
+    """
+    entity = Entity()
+    assert entity.classes == (), "Wrong classes"
 
 
 def test_invalid_classes():

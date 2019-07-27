@@ -31,16 +31,6 @@ def test_name(name, expected_name):
     assert field.name == expected_name, "Wrong name"
 
 
-def test_default_classes():
-    """Check default classes of the field.
-
-    1. Create a field without specifying classes.
-    2. Check classes of the field.
-    """
-    field = Field(name="test default classes")
-    assert field.classes == (), "Wrong classes"
-
-
 @pytest.mark.parametrize(
     argnames="classes, expected_classes",
     argvalues=[
@@ -59,6 +49,16 @@ def test_classes(classes, expected_classes):
     """
     field = Field(name="test classes", classes=classes)
     assert field.classes == expected_classes, "Wrong classes"
+
+
+def test_default_classes():
+    """Check default classes of the field.
+
+    1. Create a field without specifying classes.
+    2. Check classes of the field.
+    """
+    field = Field(name="test default classes")
+    assert field.classes == (), "Wrong classes"
 
 
 def test_invalid_classes():
