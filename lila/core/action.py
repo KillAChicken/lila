@@ -19,7 +19,7 @@ class Action(Component):
             encoding_type=None,
         ):
         # pylint: disable=too-many-arguments
-        super(Action, self).__init__(classes=classes)
+        super(Action, self).__init__(classes=classes, title=title)
 
         self._name = str(name)
         self._target = str(target)
@@ -27,10 +27,6 @@ class Action(Component):
         if method not in self._SUPPORTED_METHODS:
             raise ValueError("Method '{0}' is not supported".format(method))
         self._method = method
-
-        if title is not None:
-            title = str(title)
-        self._title = title
 
         if any(not isinstance(field, Field) for field in fields):
             raise ValueError("Some of the fields are of incompatible type")
@@ -56,11 +52,6 @@ class Action(Component):
     def method(self):
         """Method of the action."""
         return self._method
-
-    @property
-    def title(self):
-        """Descriptive title of the action."""
-        return self._title
 
     @property
     def fields(self):

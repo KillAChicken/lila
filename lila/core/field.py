@@ -36,7 +36,7 @@ class Field(Component):
 
     def __init__(self, name, classes=(), input_type=InputType.TEXT, value=None, title=None):
         # pylint: disable=too-many-arguments
-        super(Field, self).__init__(classes=classes)
+        super(Field, self).__init__(classes=classes, title=title)
 
         self._name = str(name)
 
@@ -47,10 +47,6 @@ class Field(Component):
         if value is not None:
             value = str(value)
         self._value = value
-
-        if title is not None:
-            title = str(title)
-        self._title = title
 
     @property
     def name(self):
@@ -66,8 +62,3 @@ class Field(Component):
     def value(self):
         """Value assigned to the field."""
         return self._value
-
-    @property
-    def title(self):
-        """Descriptive title for the field."""
-        return self._title

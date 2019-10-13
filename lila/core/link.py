@@ -9,14 +9,10 @@ class Link(Component):
 
     def __init__(self, relations, target, classes=(), title=None, target_media_type=None):
         # pylint: disable=too-many-arguments
-        super(Link, self).__init__(classes=classes)
+        super(Link, self).__init__(classes=classes, title=title)
 
         self._relations = common.adjust_relations(relations)
         self._target = str(target)
-
-        if title is not None:
-            title = str(title)
-        self._title = title
 
         if target_media_type is not None:
             target_media_type = str(target_media_type)
@@ -31,11 +27,6 @@ class Link(Component):
     def target(self):
         """Target of the link."""
         return self._target
-
-    @property
-    def title(self):
-        """Descriptive title for the link."""
-        return self._title
 
     @property
     def target_media_type(self):

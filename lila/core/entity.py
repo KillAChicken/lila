@@ -13,11 +13,7 @@ class Entity(Component):
 
     def __init__(self, title=None, classes=(), properties=(), entities=(), links=(), actions=()):
         # pylint: disable=too-many-arguments
-        super(Entity, self).__init__(classes=classes)
-
-        if title is not None:
-            title = str(title)
-        self._title = title
+        super(Entity, self).__init__(classes=classes, title=title)
 
         self._properties = common.adjust_properties(properties)
 
@@ -32,11 +28,6 @@ class Entity(Component):
         if any(not isinstance(entity, (EmbeddedLink, EmbeddedRepresentation)) for entity in entities):  # pylint: disable=line-too-long
             raise ValueError("Some of the entities are of incompatible type")
         self._entities = tuple(entities)
-
-    @property
-    def title(self):
-        """Descriptive text about the entity."""
-        return self._title
 
     @property
     def properties(self):
