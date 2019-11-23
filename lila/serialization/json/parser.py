@@ -1,4 +1,4 @@
-"""Module with base parser for Siren objects."""
+"""Module with JSON parser for Siren objects."""
 
 import logging
 import json
