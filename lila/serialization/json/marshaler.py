@@ -39,7 +39,7 @@ class JSONMarshaler(Marshaler):
             logger.error("Failed to marshal a field: failed to get field's input type")
             raise ValueError("Failed to get field's input type") from error
 
-        if input_type not in InputType:
+        if not isinstance(input_type, InputType):
             logger.error("Failed to marshal a field: field's input type is not supported")
             raise ValueError("Field's input type is not supported")
 
