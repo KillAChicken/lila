@@ -3,6 +3,7 @@
 import pytest
 
 from lila.core.field import InputType
+from lila.core.action import Method
 from lila.core.link import EmbeddedLink
 
 
@@ -45,7 +46,7 @@ class _DataFactory:
             self,
             name="name",
             classes=(),
-            method="GET",
+            method=Method.GET,
             target="/action",
             title=None,
             encoding_type=None,
@@ -56,7 +57,7 @@ class _DataFactory:
 
         :param name: name of the action.
         :param classes: iterable with classes of the action.
-        :param method: method of the action.
+        :param method: item from :class:Method enumerable.
         :param target: target of the action.
         :param title: title of the action.
         :param encoding_type: encoding type of the action.
@@ -77,7 +78,7 @@ class _DataFactory:
         return {
             "name": name,
             "class": list(classes),
-            "method": method,
+            "method": method.value,
             "href": target,
             "title": title,
             "type": encoding_type,

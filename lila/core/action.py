@@ -1,19 +1,29 @@
 """Module to work with Siren actions."""
 
+import enum
+
 from lila.core.base import Component
 from lila.core.field import Field
 
 
+class Method(enum.Enum):
+    """Enumerable with supported methods."""
+    GET = "GET"
+    PUT = "PUT"
+    POST = "POST"
+    DELETE = "DELETE"
+    PATCH = "PATCH"
+
+
 class Action(Component):
     """Class to work with Siren actions."""
-    _SUPPORTED_METHODS = set(("GET", "PUT", "POST", "DELETE", "PATCH"))
 
     def __init__(
             self,
             name,
             target,
             classes=(),
-            method="GET",
+            method=Method.GET,
             title=None,
             fields=(),
             encoding_type=None,
@@ -24,7 +34,7 @@ class Action(Component):
         self._name = str(name)
         self._target = str(target)
 
-        if method not in self._SUPPORTED_METHODS:
+        if not isinstance(method, Method):
             raise ValueError("Method '{0}' is not supported".format(method))
         self._method = method
 

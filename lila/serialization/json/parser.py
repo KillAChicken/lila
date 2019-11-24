@@ -4,7 +4,7 @@ import logging
 import json
 
 from lila.core.field import InputType, Field
-from lila.core.action import Action
+from lila.core.action import Method, Action
 from lila.core.link import Link, EmbeddedLink
 from lila.core.entity import Entity, EmbeddedRepresentation
 from lila.serialization.parser import Parser
@@ -68,7 +68,7 @@ class JSONParser(Parser):
         data = _ensure_json(data)
 
         logger = logging.getLogger(__name__)
-        logger.debug("Try to parse a field from '%s'", data)
+        logger.debug("Try to parse an action from '%s'", data)
 
         try:
             name = data["name"]
@@ -77,7 +77,15 @@ class JSONParser(Parser):
             raise ValueError("Action data do not have required 'name' key")
 
         classes = data.get("class", ())
-        method = data.get("method", "GET")
+
+        method_value = data.get("method", Method.GET.value)
+        try:
+            method = next(
+                action_method for action_method in Method if action_method.value == method_value
+                )
+        except StopIteration:
+            logger.error("Failed to parse an action: unsupported method is specified")
+            raise ValueError("Unsupported method is specified")
 
         try:
             target = data["href"]

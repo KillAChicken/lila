@@ -1,8 +1,10 @@
 """Test cases for Siren Actions."""
 
+import random
+
 import pytest
 
-from lila.core.action import Action
+from lila.core.action import Method, Action
 from lila.core.field import Field
 
 
@@ -94,17 +96,14 @@ def test_invalid_classes():
         Action(name="test invalid classes", target="/test-invalid-classes", classes=1)
 
 
-@pytest.mark.parametrize(
-    argnames="method",
-    argvalues=["GET", "POST", "PATCH", "PUT", "DELETE"],
-)
-def test_method(method):
+def test_method():
     """Check method of an action.
 
     1. Create an action with different methods.
     2. Get method of the action.
     3. Check the method.
     """
+    method = random.choice(list(Method))
     action = Action(name="test action method", target="/test-action-method/", method=method)
     assert action.method == method, "Wrong method"
 
@@ -117,19 +116,17 @@ def test_default_method():
     3. Check the method.
     """
     action = Action(name="test default method", target="/test-default-method/")
-    assert action.method == "GET", "Wrong method"
+    assert action.method == Method.GET, "Wrong method"
 
 
 @pytest.mark.parametrize(
     argnames="method",
     argvalues=[
-        "get",
-        "fake",
+        "GET",
         None,
     ],
     ids=[
-        "Invalid case",
-        "Non-existing",
+        "Not supported",
         "None",
     ],
 )

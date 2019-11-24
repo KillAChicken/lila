@@ -6,7 +6,7 @@ import random
 import pytest
 
 from lila.core.field import Field
-from lila.core.action import Action
+from lila.core.action import Method, Action
 from lila.serialization.json.parser import JSONParser
 
 
@@ -112,11 +112,11 @@ def test_method(json_data_factory):
     2. Parse an action from a dictionary with a specific method.
     3. Check method of the parsed action.
     """
-    method = random.choice(("GET", "PUT", "POST", "DELETE", "PATCH"))
+    method = random.choice(list(Method))
     action_data = json_data_factory.create_action_data(method=method)
     action = JSONParser().parse_action(action_data)
 
-    assert action.method == method, "Wrong classes"
+    assert action.method == method, "Wrong method"
 
 
 def test_missing_method(json_data_factory):
@@ -126,11 +126,28 @@ def test_missing_method(json_data_factory):
     2. Parse an action from a dictionary without 'method' key.
     3. Check that parsed action has GET as an action.
     """
-    action_data = json_data_factory.create_action_data(method="POST")
+    action_data = json_data_factory.create_action_data(method=Method.POST)
     action_data.pop("method", None)
     action = JSONParser().parse_action(action_data)
 
-    assert action.method == "GET", "Wrong method"
+    assert action.method == Method.GET, "Wrong method"
+
+
+def test_invalid_method(json_data_factory):
+    """Test that ValueError is raised if method is invalid.
+
+    1. Create a json parser.
+    2. Try to parse an action from a dictionary with invalid value for method.
+    3. Check that ValueError is raised.
+    4. Check the error message.
+    """
+    action_data = json_data_factory.create_action_data()
+    action_data["method"] = "fake method"
+
+    with pytest.raises(ValueError) as error_info:
+        JSONParser().parse_action(action_data)
+
+    assert error_info.value.args[0] == "Unsupported method is specified", "Wrong error"
 
 
 @pytest.mark.parametrize(
@@ -368,13 +385,14 @@ def test_creation_error(json_data_factory):
     3. Check that ValueError is raised.
     4. Check the error message.
     """
-    invalid_method = "fake"
+    action_data = json_data_factory.create_action_data(fields=[Field(name="ignored field")])
+    parser = JSONParser()
+    parser.parse_field = lambda data: "invalid field"
 
-    action_data = json_data_factory.create_action_data(method=invalid_method)
     with pytest.raises(ValueError) as error_info:
-        JSONParser().parse_action(action_data)
+        parser.parse_action(action_data)
 
     with pytest.raises(ValueError) as expected_error_info:
-        Action(name="name", target="/target", method=invalid_method)
+        Action(name="name", target="/target", fields=["invalid field"])
 
     assert error_info.value.args[0] == expected_error_info.value.args[0], "Wrong error"
