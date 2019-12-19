@@ -11,3 +11,11 @@ class Marshaler:
         :returns: serialized field.
         """
         raise NotImplementedError("Marshaler does not support siren fields")
+
+    def marshal_action(self, action):
+        """Marshal Siren action.
+
+        :param action: Siren Action.
+        :returns: serialized action.
+        """
+        raise NotImplementedError("Marshaler does not support siren actions")
