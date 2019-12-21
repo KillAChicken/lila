@@ -155,3 +155,65 @@ class JSONMarshaler(Marshaler):
 
         logger.info("Successfully marshaled an action")
         return marshaled_action
+
+    def marshal_link(self, link):
+        """Marshal Siren link.
+
+        :param link: Siren Link.
+        :returns: dictionary with link data.
+        """
+        logger = logging.getLogger(__name__)
+        logger.debug("Try to marhal a link '%s'", link)
+
+        try:
+            relations = list(str(relation) for relation in link.relations)
+        except AttributeError as error:
+            logger.error("Failed to marshal a link: failed to get link's relations")
+            raise ValueError("Failed to get link's relations") from error
+        except TypeError as error:
+            logger.error("Failed to marshal a link: failed to iterate over link's relations")
+            raise ValueError("Failed to iterate over link's relations") from error
+
+        try:
+            classes = list(str(class_) for class_ in link.classes)
+        except AttributeError as error:
+            logger.error("Failed to marshal a link: failed to get link's classes")
+            raise ValueError("Failed to get link's classes") from error
+        except TypeError as error:
+            logger.error("Failed to marshal a link: failed to iterate over link's classes")
+            raise ValueError("Failed to iterate over link's classes") from error
+
+        try:
+            target = str(link.target)
+        except AttributeError as error:
+            logger.error("Failed to marshal a link: failed to get action's link")
+            raise ValueError("Failed to get link's target") from error
+
+        try:
+            title = link.title
+        except AttributeError as error:
+            logger.error("Failed to marshal a link: failed to get link's title")
+            raise ValueError("Failed to get link's title") from error
+
+        if title is not None:
+            title = str(title)
+
+        try:
+            target_media_type = link.target_media_type
+        except AttributeError as error:
+            logger.error("Failed to marshal a link: failed to get link's target media type")
+            raise ValueError("Failed to get link's target media type") from error
+
+        if target_media_type is not None:
+            target_media_type = str(target_media_type)
+
+        marshaled_link = {
+            "rel": relations,
+            "class": classes,
+            "href": target,
+            "title": title,
+            "type": target_media_type,
+            }
+
+        logger.info("Successfully marshaled a link")
+        return marshaled_link

@@ -19,3 +19,11 @@ class Marshaler:
         :returns: serialized action.
         """
         raise NotImplementedError("Marshaler does not support siren actions")
+
+    def marshal_link(self, link):
+        """Marshal Siren link.
+
+        :param link: Siren Link.
+        :returns: dictionary with link data.
+        """
+        raise NotImplementedError("Marshaler does not support siren links")
