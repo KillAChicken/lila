@@ -27,3 +27,11 @@ class Marshaler:
         :returns: dictionary with link data.
         """
         raise NotImplementedError("Marshaler does not support siren links")
+
+    def marshal_embedded_link(self, embedded_link):
+        """Marshal embedded Siren link.
+
+        :param embedded_link: embedded Siren Link.
+        :returns: dictionary with embedded link data.
+        """
+        raise NotImplementedError("Marshaler does not support embedded siren links")

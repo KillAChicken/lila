@@ -186,7 +186,7 @@ class JSONMarshaler(Marshaler):
         try:
             target = str(link.target)
         except AttributeError as error:
-            logger.error("Failed to marshal a link: failed to get action's link")
+            logger.error("Failed to marshal a link: failed to get link's target")
             raise ValueError("Failed to get link's target") from error
 
         try:
@@ -216,4 +216,78 @@ class JSONMarshaler(Marshaler):
             }
 
         logger.info("Successfully marshaled a link")
+        return marshaled_link
+
+    def marshal_embedded_link(self, embedded_link):
+        """Marshal embedded Siren link.
+
+        :param embedded_link: embedded Siren Link.
+        :returns: dictionary with embedded link data.
+        """
+        logger = logging.getLogger(__name__)
+        logger.debug("Try to marhal an embedded link '%s'", embedded_link)
+
+        try:
+            relations = list(str(relation) for relation in embedded_link.relations)
+        except AttributeError as error:
+            logger.error(
+                "Failed to marshal an embedded link: failed to get relations of the embedded link",
+                )
+            raise ValueError("Failed to get relations of the embedded link") from error
+        except TypeError as error:
+            logger.error(
+                "Failed to marshal an embedded link: failed to iterate over relations of the embedded link",    # pylint: disable=line-too-long
+                )
+            raise ValueError("Failed to iterate over relations of the embedded link") from error
+
+        try:
+            classes = list(str(class_) for class_ in embedded_link.classes)
+        except AttributeError as error:
+            logger.error(
+                "Failed to marshal an embedded link: failed to get classes of the embedded link",
+            )
+            raise ValueError("Failed to get classes of the embedded link") from error
+        except TypeError as error:
+            logger.error(
+                "Failed to marshal an embedded link: failed to iterate over classes of the embedded link",  # pylint: disable=line-too-long
+                )
+            raise ValueError("Failed to iterate over classes of the embedded link") from error
+
+        try:
+            target = str(embedded_link.target)
+        except AttributeError as error:
+            logger.error("Failed to marshal an link: failed to get target of the embedded link")
+            raise ValueError("Failed to get target of the embedded link") from error
+
+        try:
+            title = embedded_link.title
+        except AttributeError as error:
+            logger.error(
+                "Failed to marshal an embedded link: failed to get title of the embedded link",
+                )
+            raise ValueError("Failed to get title of the embedded link") from error
+
+        if title is not None:
+            title = str(title)
+
+        try:
+            target_media_type = embedded_link.target_media_type
+        except AttributeError as error:
+            logger.error(
+                "Failed to marshal an embedded link: failed to get target media type of the embedded link", # pylint: disable=line-too-long
+                )
+            raise ValueError("Failed to get target media type of the embedded link") from error
+
+        if target_media_type is not None:
+            target_media_type = str(target_media_type)
+
+        marshaled_link = {
+            "rel": relations,
+            "class": classes,
+            "href": target,
+            "title": title,
+            "type": target_media_type,
+            }
+
+        logger.info("Successfully marshaled an embedded link")
         return marshaled_link
