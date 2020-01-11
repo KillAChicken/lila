@@ -1,6 +1,7 @@
 """Module with JSON marshaler for Siren objects."""
 
 import logging
+import json
 
 from lila.core.field import InputType
 from lila.core.action import Method
@@ -17,7 +18,7 @@ class JSONMarshaler(Marshaler):
         :returns: dictionary with field data.
         """
         logger = logging.getLogger(__name__)
-        logger.debug("Try to marhal a field '%s'", field)
+        logger.debug("Try to marshal a field '%s'", field)
 
         try:
             name = str(field.name)
@@ -80,7 +81,7 @@ class JSONMarshaler(Marshaler):
         :returns: dictionary with action data.
         """
         logger = logging.getLogger(__name__)
-        logger.debug("Try to marhal an action '%s'", action)
+        logger.debug("Try to marshal an action '%s'", action)
 
         try:
             name = str(action.name)
@@ -163,7 +164,7 @@ class JSONMarshaler(Marshaler):
         :returns: dictionary with link data.
         """
         logger = logging.getLogger(__name__)
-        logger.debug("Try to marhal a link '%s'", link)
+        logger.debug("Try to marshal a link '%s'", link)
 
         try:
             relations = list(str(relation) for relation in link.relations)
@@ -225,7 +226,7 @@ class JSONMarshaler(Marshaler):
         :returns: dictionary with embedded link data.
         """
         logger = logging.getLogger(__name__)
-        logger.debug("Try to marhal an embedded link '%s'", embedded_link)
+        logger.debug("Try to marshal an embedded link '%s'", embedded_link)
 
         try:
             relations = list(str(relation) for relation in embedded_link.relations)
@@ -291,3 +292,187 @@ class JSONMarshaler(Marshaler):
 
         logger.info("Successfully marshaled an embedded link")
         return marshaled_link
+
+    def marshal_embedded_representation(self, embedded_representation):
+        """Marshal Siren embedded representation.
+
+        :param embedded_representation: Siren embedded representation.
+        :returns: dictionary with embedded representation data.
+        """
+        logger = logging.getLogger(__name__)
+        logger.debug("Try to marshal an embedded representation '%s'", embedded_representation)
+
+        try:
+            relations = list(str(relation) for relation in embedded_representation.relations)
+        except AttributeError as error:
+            logger.error(
+                "Failed to marshal an embedded representation: "
+                "failed to get relations of the embedded representation",
+                )
+            raise ValueError(
+                "Failed to get relations of the embedded representation",
+                ) from error
+        except TypeError as error:
+            logger.error(
+                "Failed to marshal an embedded representation: "
+                "failed to iterate over relations of the embedded representation",
+                )
+            raise ValueError(
+                "Failed to iterate over relations of the embedded representation",
+                ) from error
+
+        try:
+            classes = list(str(class_) for class_ in embedded_representation.classes)
+        except AttributeError as error:
+            logger.error(
+                "Failed to marshal an embedded representation: "
+                "failed to get classes of the embedded representation",
+                )
+            raise ValueError("Failed to get classes of the embedded representation") from error
+        except TypeError as error:
+            logger.error(
+                "Failed to marshal an embedded representation: "
+                "failed to iterate over classes of the embedded representation",
+                )
+            raise ValueError(
+                "Failed to iterate over classes of the embedded representation",
+                ) from error
+
+        try:
+            properties = json.loads(json.dumps(embedded_representation.properties))
+        except AttributeError as error:
+            logger.error(
+                "Failed to marshal an embedded representation: "
+                "failed to get properties of the embedded representation",
+                )
+            raise ValueError("Failed to get properties of the embedded representation") from error
+        except TypeError as error:
+            logger.error(
+                "Failed to marshal an embedded representation: "
+                "failed to marshal properties of the embedded representation",
+                )
+            raise ValueError(
+                "Failed to marshal properties of the embedded representation",
+                ) from error
+
+        try:
+            entities = list(
+                self._marshal_sub_entity(entity) for entity in embedded_representation.entities
+                )
+        except AttributeError as error:
+            logger.error(
+                "Failed to marshal an embedded representation: "
+                "failed to get sub entities of the embedded representation",
+                )
+            raise ValueError("Failed to get sub entities of the embedded representation") from error
+        except TypeError as error:
+            logger.error(
+                "Failed to marshal an embedded representation: "
+                "failed to iterate over sub entities of the embedded representation",
+                )
+            raise ValueError(
+                "Failed to iterate over sub entities of the embedded representation",
+                ) from error
+        except ValueError as error:
+            logger.error(
+                "Failed to marshal an embedded representation: "
+                "failed to marshal sub entities of the embedded representation",
+                )
+            raise ValueError(
+                "Failed to marshal sub entities of the embedded representation",
+                ) from error
+
+        try:
+            links = list(self.marshal_link(link) for link in embedded_representation.links)
+        except AttributeError as error:
+            logger.error(
+                "Failed to marshal an embedded representation: "
+                "failed to get links of the embedded representation",
+                )
+            raise ValueError("Failed to get links of the embedded representation") from error
+        except TypeError as error:
+            logger.error(
+                "Failed to marshal an embedded representation: "
+                "failed to iterate over links of the embedded representation",
+                )
+            raise ValueError(
+                "Failed to iterate over links of the embedded representation",
+                ) from error
+        except ValueError as error:
+            logger.error(
+                "Failed to marshal an embedded representation: "
+                "failed to marshal links of the embedded representation",
+                )
+            raise ValueError("Failed to marshal links of the embedded representation") from error
+
+        try:
+            actions = list(
+                self.marshal_action(action) for action in embedded_representation.actions
+                )
+        except AttributeError as error:
+            logger.error(
+                "Failed to marshal an embedded representation: "
+                "failed to get actions of the embedded representation",
+                )
+            raise ValueError("Failed to get actions of the embedded representation") from error
+        except TypeError as error:
+            logger.error(
+                "Failed to marshal an embedded representation: "
+                "failed to iterate over actions of the embedded representation",
+                )
+            raise ValueError(
+                "Failed to iterate over actions of the embedded representation",
+                ) from error
+        except ValueError as error:
+            logger.error(
+                "Failed to marshal an embedded representation: "
+                "failed to marshal actions of the embedded representation",
+                )
+            raise ValueError("Failed to marshal actions of the embedded representation") from error
+
+        try:
+            title = embedded_representation.title
+        except AttributeError as error:
+            logger.error(
+                "Failed to marshal an embedded representation: "
+                "failed to get title of the embedded representation",
+                )
+            raise ValueError("Failed to get title of the embedded representation") from error
+
+        if title is not None:
+            title = str(title)
+
+        marshaled_representation = {
+            "rel": relations,
+            "class": classes,
+            "properties": properties,
+            "entities": entities,
+            "links": links,
+            "actions": actions,
+            "title": title,
+            }
+
+        logger.info("Successfully marshaled an embedded representation")
+        return marshaled_representation
+
+    def _marshal_sub_entity(self, sub_entity):
+        """Marshal Siren sub entity.
+
+        :param sub_entity: either Siren embedded link or embedded representation.
+        :returns: dictionary with data of the sub entity.
+        """
+        logger = logging.getLogger(__name__)
+        logger.debug("Try to marshal sub entity")
+        try:
+            sub_entity.target
+        except AttributeError:
+            logger.debug("Marshal sub entity as an embedded representation")
+            marshaled_sub_entity = self.marshal_embedded_representation(
+                embedded_representation=sub_entity,
+                )
+        else:
+            logger.debug("Marshal sub entity as an embedded link")
+            marshaled_sub_entity = self.marshal_embedded_link(embedded_link=sub_entity)
+
+        logger.debug("Successfully marshaled sub entity")
+        return marshaled_sub_entity

@@ -443,7 +443,7 @@ def test_non_marshalable_fields():
     ids=[
         "Empty list",
         "Single field",
-        "Multiple classes",
+        "Multiple fields",
         ],
     )
 def test_fields(fields):
@@ -451,8 +451,8 @@ def test_fields(fields):
 
     1. Create a json marshaler.
     2. Replace marshal_field of the marshaler so that it returns fake data.
-    2. Marshal an action with specific fields.
-    3. Check a key with the fields (fake data) in the marshaled data.
+    3. Marshal an action with specific fields.
+    4. Check a key with the fields (fake data) in the marshaled data.
     """
     class _FixedFieldsAction(Action):
         @property

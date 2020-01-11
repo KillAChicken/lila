@@ -35,3 +35,11 @@ class Marshaler:
         :returns: dictionary with embedded link data.
         """
         raise NotImplementedError("Marshaler does not support embedded siren links")
+
+    def marshal_embedded_representation(self, embedded_representation):
+        """Marshal Siren embedded representation.
+
+        :param embedded_representation: Siren embedded representation.
+        :returns: dictionary with embedded representation data.
+        """
+        raise NotImplementedError("Marshaler does not support siren embedded representation")
