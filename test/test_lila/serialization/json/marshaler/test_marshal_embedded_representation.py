@@ -317,34 +317,7 @@ def test_non_iterable_sub_entities():
     assert error_info.value.args[0] == expected_message, "Wrong error"
 
 
-@pytest.fixture(params=["link", "representation"])
-def non_marshalable_sub_entity(request):
-    """Non marshalable sub entity."""
-    sub_entity = None
-    if request.param == "link":
-
-        class _NonMarshallableLink(EmbeddedLink):
-            @property
-            def classes(self):
-                return None
-
-        sub_entity = _NonMarshallableLink(relations=["self"], target="/self")
-    elif request.param == "representation":
-
-        class _NonMarshallableRepresentation(EmbeddedRepresentation):
-            @property
-            def classes(self):
-                return None
-
-        sub_entity = _NonMarshallableRepresentation(relations=["self"])
-
-    if sub_entity is None:
-        pytest.fail("Unknown sub entity type")
-
-    return sub_entity
-
-
-def test_non_marshalable_sub_entities(non_marshalable_sub_entity):  # pylint: disable=redefined-outer-name
+def test_non_marshalable_sub_entities(non_marshalable_sub_entity):
     # pylint: disable=line-too-long
     """Test that ValueError is raised if one of sub entities of the embedded representation is not marshallable.
 

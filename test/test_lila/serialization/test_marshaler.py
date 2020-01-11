@@ -5,7 +5,7 @@ import pytest
 from lila.core.field import Field
 from lila.core.action import Action
 from lila.core.link import Link, EmbeddedLink
-from lila.core.entity import EmbeddedRepresentation
+from lila.core.entity import Entity, EmbeddedRepresentation
 from lila.serialization.marshaler import Marshaler
 
 
@@ -81,3 +81,19 @@ def test_marshal_embedded_representation():
         Marshaler().marshal_embedded_representation(embedded_representation=representation)
 
     assert error_info.value.args[0] == "Marshaler does not support siren embedded representation"
+
+
+def test_marshal_entity():
+    """Check that NotImplementedError is raised if marshal_entity is called.
+
+    1. Create an instance of Marshaler class.
+    2. Try to marshal an entity.
+    3. Check that NotImplementedError is raised.
+    4. Check the error message.
+    """
+    entity = Entity()
+
+    with pytest.raises(NotImplementedError) as error_info:
+        Marshaler().marshal_entity(entity=entity)
+
+    assert error_info.value.args[0] == "Marshaler does not support siren entity"

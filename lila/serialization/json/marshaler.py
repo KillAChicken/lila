@@ -455,6 +455,94 @@ class JSONMarshaler(Marshaler):
         logger.info("Successfully marshaled an embedded representation")
         return marshaled_representation
 
+    def marshal_entity(self, entity):
+        """Marshal Siren entity.
+
+        :param entity: Siren entity.
+        :returns: dictionary with entity data.
+        """
+        logger = logging.getLogger(__name__)
+        logger.debug("Try to marshal an entity '%s'", entity)
+
+        try:
+            classes = list(str(class_) for class_ in entity.classes)
+        except AttributeError as error:
+            logger.error("Failed to marshal an entity: failed to get entity's classes")
+            raise ValueError("Failed to get entity's classes") from error
+        except TypeError as error:
+            logger.error("Failed to marshal an entity: failed to iterate over entity's classes")
+            raise ValueError("Failed to iterate over entity's classes") from error
+
+        try:
+            properties = json.loads(json.dumps(entity.properties))
+        except AttributeError as error:
+            logger.error("Failed to marshal an entity: failed to get entity's")
+            raise ValueError("Failed to get entity's properties") from error
+        except TypeError as error:
+            logger.error("Failed to marshal an entity: failed to marshal entity's properties")
+            raise ValueError("Failed to marshal entity's properties") from error
+
+        try:
+            entities = list(self._marshal_sub_entity(sub_entity) for sub_entity in entity.entities)
+        except AttributeError as error:
+            logger.error("Failed to marshal an entity: failed to get sub entities of the entity")
+            raise ValueError("Failed to get sub entities of the entity") from error
+        except TypeError as error:
+            logger.error(
+                "Failed to marshal an entity: failed to iterate over sub entities of the entity",
+                )
+            raise ValueError("Failed to iterate over sub entities of the entity") from error
+        except ValueError as error:
+            logger.error(
+                "Failed to marshal an entity: failed to marshal sub entities of the entity",
+                )
+            raise ValueError("Failed to marshal sub entities of the entity") from error
+
+        try:
+            links = list(self.marshal_link(link) for link in entity.links)
+        except AttributeError as error:
+            logger.error("Failed to marshal an entity: failed to get entity's links")
+            raise ValueError("Failed to get entity's links") from error
+        except TypeError as error:
+            logger.error("Failed to marshal an entity: failed to iterate over entity's links")
+            raise ValueError("Failed to iterate over entity's links") from error
+        except ValueError as error:
+            logger.error("Failed to marshal an entity: failed to marshal entity's links")
+            raise ValueError("Failed to marshal entity's links") from error
+
+        try:
+            actions = list(self.marshal_action(action) for action in entity.actions)
+        except AttributeError as error:
+            logger.error("Failed to marshal an entity: failed to get entity's actions")
+            raise ValueError("Failed to get entity's actions") from error
+        except TypeError as error:
+            logger.error("Failed to marshal an entity: failed to iterate over entity's actions")
+            raise ValueError("Failed to iterate over entity's actions") from error
+        except ValueError as error:
+            logger.error("Failed to marshal an entity: failed to marshal entity's actions")
+            raise ValueError("Failed to marshal entity's actions") from error
+
+        try:
+            title = entity.title
+        except AttributeError as error:
+            logger.error("Failed to marshal an entity: failed to get entity's title")
+            raise ValueError("Failed to get entity's title") from error
+
+        if title is not None:
+            title = str(title)
+
+        marshaled_entity = {
+            "class": classes,
+            "properties": properties,
+            "entities": entities,
+            "links": links,
+            "actions": actions,
+            "title": title,
+            }
+
+        logger.info("Successfully marshaled an entity")
+        return marshaled_entity
+
     def _marshal_sub_entity(self, sub_entity):
         """Marshal Siren sub entity.
 

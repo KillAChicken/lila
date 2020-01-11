@@ -43,3 +43,11 @@ class Marshaler:
         :returns: dictionary with embedded representation data.
         """
         raise NotImplementedError("Marshaler does not support siren embedded representation")
+
+    def marshal_entity(self, entity):
+        """Marshal Siren entity.
+
+        :param entity: Siren entity.
+        :returns: dictionary with entity data.
+        """
+        raise NotImplementedError("Marshaler does not support siren entity")
