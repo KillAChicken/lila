@@ -173,7 +173,7 @@ def test_not_supported_input_type():
     class _NotSupportedInputTypeField(Field):
         @property
         def input_type(self):
-            return "text"
+            return InputType.TEXT.name
 
     field = _NotSupportedInputTypeField(name="Input type is not supported")
 
@@ -183,19 +183,34 @@ def test_not_supported_input_type():
     assert error_info.value.args[0] == "Field's input type is not supported", "Wrong error"
 
 
-def test_input_type():
+@pytest.mark.parametrize(
+    argnames="input_type",
+    argvalues=[
+        random.choice(list(InputType)),
+        random.choice(list(InputType)).value,
+        ],
+    ids=[
+        "Enumeration item",
+        "String",
+        ],
+    )
+def test_input_type(input_type):
     """Test that input type is properly marshaled.
 
     1. Create a json marshaler.
     2. Marshal a field with a specific input type.
     3. Check a key with the input type in the marshaled data.
     """
-    input_type = random.choice(list(InputType))
-    field = Field(name="fixed input type", input_type=input_type)
+    class _FixedInputTypeField(Field):
+        @property
+        def input_type(self):
+            return input_type
+
+    field = _FixedInputTypeField(name="fixed input type")
 
     field_data = JSONMarshaler().marshal_field(field=field)
     assert "type" in field_data, "Marshaled data does not have 'type' key"
-    assert field_data["type"] == input_type.value, "Wrong input type"
+    assert field_data["type"] == InputType(input_type).value, "Wrong input type"
 
 
 def test_missing_value():

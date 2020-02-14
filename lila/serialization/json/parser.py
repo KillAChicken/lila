@@ -33,10 +33,10 @@ class JSONParser(Parser):
 
         classes = data.get("class", ())
 
-        input_type_value = data.get("type", InputType.TEXT.value)
+        input_type_value = str(data.get("type", InputType.TEXT.value))
         try:
-            input_type = next(type_ for type_ in InputType if type_.value == input_type_value)
-        except StopIteration:
+            input_type = InputType(input_type_value)
+        except ValueError:
             logger.error("Failed to parse a field: unsupported input type is specified")
             raise ValueError("Unsupported input type is specified")
 

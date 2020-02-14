@@ -5,6 +5,7 @@ import enum
 from lila.core.base import Component
 
 
+@enum.unique
 class InputType(enum.Enum):
     """Enumerable with supported input types."""
     HIDDEN = "hidden"
@@ -30,6 +31,9 @@ class InputType(enum.Enum):
     RESET = "reset"
     BUTTON = "button"
 
+    def __str__(self):
+        return self.value
+
 
 class Field(Component):
     """Class to work with Siren fields."""
@@ -40,9 +44,10 @@ class Field(Component):
 
         self._name = str(name)
 
-        if not isinstance(input_type, InputType):
+        try:
+            self._input_type = InputType(str(input_type))
+        except ValueError:
             raise ValueError("Unsupported input type '{0}'".format(input_type))
-        self._input_type = input_type
 
         if value is not None:
             value = str(value)

@@ -7,6 +7,16 @@ import pytest
 from lila.core.field import InputType, Field
 
 
+def test_string_input_field():
+    """Check that string representation of InputType is its value.
+
+    1. Get an input field from the enumeration.
+    2. Check that its string representation is equal to its value.
+    """
+    input_type = random.choice(list(InputType))
+    assert str(input_type) == input_type.value, "Wrong string representation"
+
+
 @pytest.mark.parametrize(
     argnames="name, expected_name",
     argvalues=[
@@ -71,16 +81,26 @@ def test_invalid_classes():
         Field(name="test invalid classes", classes=1)
 
 
-def test_input_type():
+@pytest.mark.parametrize(
+    argnames="input_type",
+    argvalues=[
+        random.choice(list(InputType)),
+        random.choice(list(InputType)).value,
+        ],
+    ids=[
+        "Enumeration item",
+        "String value",
+        ],
+    )
+def test_input_type(input_type):
     """Check input type of the field.
 
     1. Create a field with explicit input type.
     2. Get input type of the field.
     3. Check the type.
     """
-    input_type = random.choice(list(InputType))
     field = Field(name="test input type", input_type=input_type)
-    assert field.input_type == input_type, "Wrong input type"
+    assert field.input_type == InputType(input_type), "Wrong input type"
 
 
 def test_default_input_type():

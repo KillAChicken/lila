@@ -36,12 +36,14 @@ class JSONMarshaler(Marshaler):
             raise ValueError("Failed to iterate over field's classes") from error
 
         try:
-            input_type = field.input_type
+            input_type = str(field.input_type)
         except AttributeError as error:
             logger.error("Failed to marshal a field: failed to get field's input type")
             raise ValueError("Failed to get field's input type") from error
 
-        if not isinstance(input_type, InputType):
+        try:
+            input_type = InputType(input_type)
+        except ValueError:
             logger.error("Failed to marshal a field: field's input type is not supported")
             raise ValueError("Field's input type is not supported")
 
