@@ -101,12 +101,14 @@ class JSONMarshaler(Marshaler):
             raise ValueError("Failed to iterate over action's classes") from error
 
         try:
-            method = action.method
+            method = str(action.method)
         except AttributeError as error:
             logger.error("Failed to marshal an action: failed to get action's method")
             raise ValueError("Failed to get action's method") from error
 
-        if not isinstance(method, Method):
+        try:
+            method = Method(method)
+        except ValueError:
             logger.error("Failed to marshal an action: action's method is not supported")
             raise ValueError("Action's method is not supported")
 

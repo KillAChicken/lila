@@ -8,6 +8,16 @@ from lila.core.action import Method, Action
 from lila.core.field import Field
 
 
+def test_string_method():
+    """Check that string representation of Method is its value.
+
+    1. Get a method from the enumeration.
+    2. Check that its string representation is equal to its value.
+    """
+    method = random.choice(list(Method))
+    assert str(method) == method.value, "Wrong string representation"
+
+
 @pytest.mark.parametrize(
     argnames="name, expected_name",
     argvalues=[
@@ -96,16 +106,26 @@ def test_invalid_classes():
         Action(name="test invalid classes", target="/test-invalid-classes", classes=1)
 
 
-def test_method():
+@pytest.mark.parametrize(
+    argnames="method",
+    argvalues=[
+        random.choice(list(Method)),
+        random.choice(list(Method)).value,
+        ],
+    ids=[
+        "Enumeration item",
+        "String",
+        ],
+    )
+def test_method(method):
     """Check method of an action.
 
     1. Create an action with different methods.
     2. Get method of the action.
     3. Check the method.
     """
-    method = random.choice(list(Method))
     action = Action(name="test action method", target="/test-action-method/", method=method)
-    assert action.method == method, "Wrong method"
+    assert action.method == Method(method), "Wrong method"
 
 
 def test_default_method():
@@ -122,7 +142,7 @@ def test_default_method():
 @pytest.mark.parametrize(
     argnames="method",
     argvalues=[
-        "GET",
+        "get",
         None,
     ],
     ids=[

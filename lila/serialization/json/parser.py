@@ -78,12 +78,10 @@ class JSONParser(Parser):
 
         classes = data.get("class", ())
 
-        method_value = data.get("method", Method.GET.value)
+        method_value = str(data.get("method", Method.GET.value))
         try:
-            method = next(
-                action_method for action_method in Method if action_method.value == method_value
-                )
-        except StopIteration:
+            method = Method(method_value)
+        except ValueError:
             logger.error("Failed to parse an action: unsupported method is specified")
             raise ValueError("Unsupported method is specified")
 

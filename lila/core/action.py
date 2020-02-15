@@ -6,6 +6,7 @@ from lila.core.base import Component
 from lila.core.field import Field
 
 
+@enum.unique
 class Method(enum.Enum):
     """Enumerable with supported methods."""
     GET = "GET"
@@ -13,6 +14,9 @@ class Method(enum.Enum):
     POST = "POST"
     DELETE = "DELETE"
     PATCH = "PATCH"
+
+    def __str__(self):
+        return self.value
 
 
 class Action(Component):
@@ -34,9 +38,10 @@ class Action(Component):
         self._name = str(name)
         self._target = str(target)
 
-        if not isinstance(method, Method):
+        try:
+            self._method = Method(str(method))
+        except ValueError:
             raise ValueError("Method '{0}' is not supported".format(method))
-        self._method = method
 
         if any(not isinstance(field, Field) for field in fields):
             raise ValueError("Some of the fields are of incompatible type")

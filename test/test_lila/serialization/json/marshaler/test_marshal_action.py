@@ -180,7 +180,7 @@ def test_not_supported_method():
     class _NotSupportedMethodAction(Action):
         @property
         def method(self):
-            return "GET"
+            return "get"
 
     action = _NotSupportedMethodAction(name="Method is not supported", target="/unsupported-method")
 
@@ -190,19 +190,34 @@ def test_not_supported_method():
     assert error_info.value.args[0] == "Action's method is not supported", "Wrong error"
 
 
-def test_method():
+@pytest.mark.parametrize(
+    argnames="method",
+    argvalues=[
+        random.choice(list(Method)),
+        random.choice(list(Method)).value,
+        ],
+    ids=[
+        "Enumeration item",
+        "String",
+        ],
+    )
+def test_method(method):
     """Test that method is properly marshaled.
 
     1. Create a json marshaler.
     2. Marshal an action with a specific method.
     3. Check a key with the method in the marshaled data.
     """
-    method = random.choice(list(Method))
-    action = Action(name="fixed method", target="/fixed/method", method=method)
+    class _FixedMethodAction(Action):
+        @property
+        def method(self):
+            return method
+
+    action = _FixedMethodAction(name="fixed method", target="/fixed/method")
 
     action_data = JSONMarshaler().marshal_action(action=action)
     assert "method" in action_data, "Marshaled data does not have 'method' key"
-    assert action_data["method"] == method.value, "Wrong method"
+    assert action_data["method"] == Method(method).value, "Wrong method"
 
 
 def test_missing_target():
