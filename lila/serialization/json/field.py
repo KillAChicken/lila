@@ -1,7 +1,8 @@
-"""Module with default marshaler for a field."""
+"""Module with default marshaler and parser for a field."""
 
 import logging
-from lila.core.field import InputType
+
+from lila.core.field import Field, InputType
 
 
 class FieldMarshaler:
@@ -14,7 +15,6 @@ class FieldMarshaler:
         """Marshal the field.
 
         :returns: dictionary with field data.
-        :raises: :class:ValueError.
         """
         return {
             "name": self.marshal_name(),
@@ -117,3 +117,132 @@ class FieldMarshaler:
             title = str(title)
 
         return title
+
+
+class FieldParser:
+    """Class to parse a single field."""
+
+    def __init__(self, data):
+        self._data = data
+
+    def parse(self):
+        """Parse a field from the data.
+
+        :returns: :class:`Field <lila.core.field.Field>`.
+        """
+        return Field(
+            name=self.parse_name(),
+            classes=self.parse_classes(),
+            input_type=self.parse_input_type(),
+            value=self.parse_value(),
+            title=self.parse_title(),
+            )
+
+    def parse_name(self):
+        """Parse field's name.
+
+        :returns: string name of the field.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            field_name = self._data["name"]
+        except TypeError:
+            logger.error("Failed to get name from field data")
+            raise ValueError("Failed to get name from field data")
+        except KeyError:
+            logger.error("Field data do not have required 'name' key")
+            raise ValueError("Field data do not have required 'name' key")
+
+        return str(field_name)
+
+    def parse_classes(self):
+        """Parse field's classes.
+
+        :returns: list with string names of field's classes.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            field_classes = self._data["class"]
+        except TypeError:
+            logger.error("Failed to get classes from field data")
+            raise ValueError("Failed to get classes from field data")
+        except KeyError:
+            field_classes = ()
+
+        try:
+            field_classes = tuple(str(class_) for class_ in field_classes)
+        except TypeError:
+            logger.error("Failed to iterate over classes from field data")
+            raise ValueError("Failed to iterate over classes from field data")
+
+        return field_classes
+
+    def parse_input_type(self):
+        """Parse field's input type.
+
+        :returns: :class:`InputType <lila.core.field.InputType>`.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            field_input_type = self._data["type"]
+        except TypeError:
+            logger.error("Failed to get input type from field data")
+            raise ValueError("Failed to get input type from field data")
+        except KeyError:
+            field_input_type = InputType.TEXT.value
+
+        try:
+            field_input_type = InputType(field_input_type)
+        except ValueError:
+            logger.error("Field data contain not supported input type")
+            raise ValueError("Field data contain not supported input type")
+
+        return field_input_type
+
+    def parse_value(self):
+        """Parse field's value.
+
+        :returns: string value or None.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            field_value = self._data["value"]
+        except TypeError:
+            logger.error("Failed to get value from field data")
+            raise ValueError("Failed to get value from field data")
+        except KeyError:
+            field_value = None
+
+        if field_value is not None:
+            field_value = str(field_value)
+
+        return field_value
+
+    def parse_title(self):
+        """Parse field's title.
+
+        :returns: string title of the field or None.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            field_title = self._data["title"]
+        except TypeError:
+            logger.error("Failed to get title from field data")
+            raise ValueError("Failed to get title from field data")
+        except KeyError:
+            field_title = None
+
+        if field_title is not None:
+            field_title = str(field_title)
+
+        return field_title
