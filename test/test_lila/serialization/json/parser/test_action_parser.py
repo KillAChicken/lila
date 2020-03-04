@@ -334,13 +334,18 @@ def test_missing_fields():
 def test_non_parsable_fields():
     """Test that ValueError is raised if one of fields can't be parsed.
 
-    1. Create an action parser for an object with fields data that are not parsable.
-    2. Try to call parse_fields method.
-    3. Check that ValueError is raised.
-    4. Check the error message.
+    1. Create json parser that raises exception when parse_field method is called.
+    2. Create an action parser with the json parser.
+    3. Try to call parse_fields method.
+    4. Check that ValueError is raised.
+    5. Check the error message.
     """
+    class _FieldErrorParser(JSONParser):
+        def parse_field(self, data):
+            raise Exception()
+
     with pytest.raises(ValueError) as error_info:
-        ActionParser(data={"fields": [{}]}, parser=JSONParser()).parse_fields()
+        ActionParser(data={"fields": [{}]}, parser=_FieldErrorParser()).parse_fields()
 
     assert error_info.value.args[0] == "Failed to parse action's fields", "Wrong error"
 

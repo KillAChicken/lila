@@ -338,15 +338,20 @@ def test_non_iterable_fields():
 def test_non_marshalable_fields():
     """Test that ValueError is raised if one of action fields is not marshallable.
 
-    1. Create an action marshaler for an object with fields that are not marshalable.
-    2. Try to call marshal_fields method.
-    3. Check that ValueError is raised.
-    4. Check the error message.
+    1. Create json marshaler that raises exception when marshal_field method is called.
+    2. Create an action marshaler with the json marshaler.
+    3. Try to call marshal_fields method.
+    4. Check that ValueError is raised.
+    5. Check the error message.
     """
+    class _FieldErrorMarshaler(JSONMarshaler):
+        def marshal_field(self, field):
+            raise Exception()
+
     FieldsAction = namedtuple("FieldsAction", "fields")
     marshaler = ActionMarshaler(
-        marshaler=JSONMarshaler(),
-        action=FieldsAction(fields=[Field(name="first"), None, Field(name="last")]),
+        marshaler=_FieldErrorMarshaler(),
+        action=FieldsAction(fields=[Field(name="first")]),
         )
 
     with pytest.raises(ValueError) as error_info:

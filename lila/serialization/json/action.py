@@ -146,18 +146,26 @@ class ActionMarshaler:
         logger = logging.getLogger(__name__)
 
         action = self._action
-        marshal_field = self._marshaler.marshal_field
         try:
-            marshaled_fields = list(marshal_field(field) for field in action.fields)
+            action_fields = list(action.fields)
         except AttributeError as error:
             logger.error("Failed to get action's fields")
             raise ValueError("Failed to get action's fields") from error
         except TypeError as error:
             logger.error("Failed to iterate over action's fields")
             raise ValueError("Failed to iterate over action's fields") from error
-        except ValueError as error:
-            logger.error("Failed to marshal action's fields")
-            raise ValueError("Failed to marshal action's fields") from error
+
+        marshal_field = self._marshaler.marshal_field
+
+        marshaled_fields = []
+        for field in action_fields:
+            try:
+                field_data = marshal_field(field)
+            except Exception as error:
+                logger.error("Failed to marshal action's fields")
+                raise ValueError("Failed to marshal action's fields") from error
+
+            marshaled_fields.append(field_data)
 
         return marshaled_fields
 
@@ -330,14 +338,21 @@ class ActionParser:
         except KeyError:
             action_fields_data = ()
 
-        parse_field = self._parser.parse_field
         try:
-            action_fields = tuple(parse_field(data) for data in action_fields_data)
+            action_fields_data = list(action_fields_data)
         except TypeError:
             logger.error("Failed to iterate over fields data from action data")
             raise ValueError("Failed to iterate over fields data from action data")
-        except ValueError as error:
-            logger.error("Failed to parse action's fields")
-            raise ValueError("Failed to parse action's fields") from error
 
-        return action_fields
+        parse_field = self._parser.parse_field
+
+        action_fields = []
+        for data in action_fields_data:
+            try:
+                field = parse_field(data)
+            except Exception as error:
+                logger.error("Failed to parse action's fields")
+                raise ValueError("Failed to parse action's fields") from error
+            action_fields.append(field)
+
+        return tuple(action_fields)
