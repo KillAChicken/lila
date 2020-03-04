@@ -339,7 +339,7 @@ def test_non_marshalable_fields():
     """Test that ValueError is raised if one of action fields is not marshallable.
 
     1. Create an action marshaler for an object with fields that are not marshalable.
-    2. Try to call marshal_action method.
+    2. Try to call marshal_fields method.
     3. Check that ValueError is raised.
     4. Check the error message.
     """

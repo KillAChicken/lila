@@ -2,7 +2,7 @@
 
 import logging
 
-from lila.core.action import Method
+from lila.core.action import Action, Method
 
 
 class ActionMarshaler:
@@ -160,3 +160,184 @@ class ActionMarshaler:
             raise ValueError("Failed to marshal action's fields") from error
 
         return marshaled_fields
+
+
+class ActionParser:
+    """Class to marshal a single action."""
+
+    def __init__(self, data, parser):
+        self._data = data
+        self._parser = parser
+
+    def parse(self):
+        """Parse an action from the data.
+
+        :returns: :class:`Action <lila.core.action.Action>`.
+        """
+        return Action(
+            name=self.parse_name(),
+            classes=self.parse_classes(),
+            method=self.parse_method(),
+            target=self.parse_target(),
+            title=self.parse_title(),
+            encoding_type=self.parse_encoding_type(),
+            fields=self.parse_fields(),
+            )
+
+    def parse_name(self):
+        """Parse action's name.
+
+        :returns: string name of the action.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            action_name = self._data["name"]
+        except TypeError:
+            logger.error("Failed to get name from action data")
+            raise ValueError("Failed to get name from action data")
+        except KeyError:
+            logger.error("Action data do not have required 'name' key")
+            raise ValueError("Action data do not have required 'name' key")
+
+        return str(action_name)
+
+    def parse_classes(self):
+        """Parse action's classes.
+
+        :returns: list with string names of action's classes.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            action_classes = self._data["class"]
+        except TypeError:
+            logger.error("Failed to get classes from action data")
+            raise ValueError("Failed to get classes from action data")
+        except KeyError:
+            action_classes = ()
+
+        try:
+            action_classes = tuple(str(class_) for class_ in action_classes)
+        except TypeError:
+            logger.error("Failed to iterate over classes from action data")
+            raise ValueError("Failed to iterate over classes from action data")
+
+        return action_classes
+
+    def parse_method(self):
+        """Parse action's method.
+
+        :returns: :class:`Method <lila.core.action.Method>`.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            action_method = self._data["method"]
+        except TypeError:
+            logger.error("Failed to get method from action data")
+            raise ValueError("Failed to get method from action data")
+        except KeyError:
+            action_method = Method.GET.value
+
+        try:
+            action_method = Method(action_method)
+        except ValueError:
+            logger.error("Action data contain not supported method")
+            raise ValueError("Action data contain not supported method")
+
+        return action_method
+
+    def parse_target(self):
+        """Parse action's target.
+
+        :returns: string target of the action.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            action_target = self._data["href"]
+        except TypeError:
+            logger.error("Failed to get target from action data")
+            raise ValueError("Failed to get target from action data")
+        except KeyError:
+            logger.error("Action data do not have required 'href' key")
+            raise ValueError("Action data do not have required 'href' key")
+
+        return str(action_target)
+
+    def parse_title(self):
+        """Parse action's title.
+
+        :returns: string title of the action or None.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            action_title = self._data["title"]
+        except TypeError:
+            logger.error("Failed to get title from action data")
+            raise ValueError("Failed to get title from action data")
+        except KeyError:
+            action_title = None
+
+        if action_title is not None:
+            action_title = str(action_title)
+
+        return action_title
+
+    def parse_encoding_type(self):
+        """Parse action's encoding type.
+
+        :returns: string value of action's encoding type or None.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            action_encoding_type = self._data["type"]
+        except TypeError:
+            logger.error("Failed to get encoding type from action data")
+            raise ValueError("Failed to get encoding type from action data")
+        except KeyError:
+            action_encoding_type = None
+
+        if action_encoding_type is not None:
+            action_encoding_type = str(action_encoding_type)
+        elif self.parse_fields():
+            action_encoding_type = "application/x-www-form-urlencoded"
+
+        return action_encoding_type
+
+    def parse_fields(self):
+        """Parse action's fields.
+
+        :returns: list with parsed action's fields.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            action_fields_data = self._data["fields"]
+        except TypeError:
+            logger.error("Failed to get fields data from action data")
+            raise ValueError("Failed to get fields data from action data")
+        except KeyError:
+            action_fields_data = ()
+
+        parse_field = self._parser.parse_field
+        try:
+            action_fields = tuple(parse_field(data) for data in action_fields_data)
+        except TypeError:
+            logger.error("Failed to iterate over fields data from action data")
+            raise ValueError("Failed to iterate over fields data from action data")
+        except ValueError as error:
+            logger.error("Failed to parse action's fields")
+            raise ValueError("Failed to parse action's fields") from error
+
+        return action_fields
