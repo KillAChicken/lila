@@ -80,9 +80,9 @@ class ActionMarshaler:
 
         try:
             method = Method(method)
-        except ValueError:
+        except ValueError as error:
             logger.error("Action's method is not supported")
-            raise ValueError("Action's method is not supported")
+            raise ValueError("Action's method is not supported") from error
 
         return method.value
 
@@ -202,12 +202,12 @@ class ActionParser:
 
         try:
             action_name = self._data["name"]
-        except TypeError:
+        except TypeError as error:
             logger.error("Failed to get name from action data")
-            raise ValueError("Failed to get name from action data")
-        except KeyError:
+            raise ValueError("Failed to get name from action data") from error
+        except KeyError as error:
             logger.error("Action data do not have required 'name' key")
-            raise ValueError("Action data do not have required 'name' key")
+            raise ValueError("Action data do not have required 'name' key") from error
 
         return str(action_name)
 
@@ -221,17 +221,17 @@ class ActionParser:
 
         try:
             action_classes = self._data["class"]
-        except TypeError:
+        except TypeError as error:
             logger.error("Failed to get classes from action data")
-            raise ValueError("Failed to get classes from action data")
+            raise ValueError("Failed to get classes from action data") from error
         except KeyError:
             action_classes = ()
 
         try:
             action_classes = tuple(str(class_) for class_ in action_classes)
-        except TypeError:
+        except TypeError as error:
             logger.error("Failed to iterate over classes from action data")
-            raise ValueError("Failed to iterate over classes from action data")
+            raise ValueError("Failed to iterate over classes from action data") from error
 
         return action_classes
 
@@ -245,17 +245,17 @@ class ActionParser:
 
         try:
             action_method = self._data["method"]
-        except TypeError:
+        except TypeError as error:
             logger.error("Failed to get method from action data")
-            raise ValueError("Failed to get method from action data")
+            raise ValueError("Failed to get method from action data") from error
         except KeyError:
             action_method = Method.GET.value
 
         try:
             action_method = Method(action_method)
-        except ValueError:
+        except ValueError as error:
             logger.error("Action data contain not supported method")
-            raise ValueError("Action data contain not supported method")
+            raise ValueError("Action data contain not supported method") from error
 
         return action_method
 
@@ -269,12 +269,12 @@ class ActionParser:
 
         try:
             action_target = self._data["href"]
-        except TypeError:
+        except TypeError as error:
             logger.error("Failed to get target from action data")
-            raise ValueError("Failed to get target from action data")
-        except KeyError:
+            raise ValueError("Failed to get target from action data") from error
+        except KeyError as error:
             logger.error("Action data do not have required 'href' key")
-            raise ValueError("Action data do not have required 'href' key")
+            raise ValueError("Action data do not have required 'href' key") from error
 
         return str(action_target)
 
@@ -288,9 +288,9 @@ class ActionParser:
 
         try:
             action_title = self._data["title"]
-        except TypeError:
+        except TypeError as error:
             logger.error("Failed to get title from action data")
-            raise ValueError("Failed to get title from action data")
+            raise ValueError("Failed to get title from action data") from error
         except KeyError:
             action_title = None
 
@@ -309,9 +309,9 @@ class ActionParser:
 
         try:
             action_encoding_type = self._data["type"]
-        except TypeError:
+        except TypeError as error:
             logger.error("Failed to get encoding type from action data")
-            raise ValueError("Failed to get encoding type from action data")
+            raise ValueError("Failed to get encoding type from action data") from error
         except KeyError:
             action_encoding_type = None
 
@@ -332,17 +332,17 @@ class ActionParser:
 
         try:
             action_fields_data = self._data["fields"]
-        except TypeError:
+        except TypeError as error:
             logger.error("Failed to get fields data from action data")
-            raise ValueError("Failed to get fields data from action data")
+            raise ValueError("Failed to get fields data from action data") from error
         except KeyError:
             action_fields_data = ()
 
         try:
             action_fields_data = list(action_fields_data)
-        except TypeError:
+        except TypeError as error:
             logger.error("Failed to iterate over fields data from action data")
-            raise ValueError("Failed to iterate over fields data from action data")
+            raise ValueError("Failed to iterate over fields data from action data") from error
 
         parse_field = self._parser.parse_field
 

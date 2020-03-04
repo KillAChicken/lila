@@ -76,9 +76,9 @@ class FieldMarshaler:
 
         try:
             input_type = InputType(input_type)
-        except ValueError:
+        except ValueError as error:
             logger.error("Field's input type is not supported")
-            raise ValueError("Field's input type is not supported")
+            raise ValueError("Field's input type is not supported") from error
 
         return input_type.value
 
@@ -148,12 +148,12 @@ class FieldParser:
 
         try:
             field_name = self._data["name"]
-        except TypeError:
+        except TypeError as error:
             logger.error("Failed to get name from field data")
-            raise ValueError("Failed to get name from field data")
-        except KeyError:
+            raise ValueError("Failed to get name from field data") from error
+        except KeyError as error:
             logger.error("Field data do not have required 'name' key")
-            raise ValueError("Field data do not have required 'name' key")
+            raise ValueError("Field data do not have required 'name' key") from error
 
         return str(field_name)
 
@@ -167,17 +167,17 @@ class FieldParser:
 
         try:
             field_classes = self._data["class"]
-        except TypeError:
+        except TypeError as error:
             logger.error("Failed to get classes from field data")
-            raise ValueError("Failed to get classes from field data")
+            raise ValueError("Failed to get classes from field data") from error
         except KeyError:
             field_classes = ()
 
         try:
             field_classes = tuple(str(class_) for class_ in field_classes)
-        except TypeError:
+        except TypeError as error:
             logger.error("Failed to iterate over classes from field data")
-            raise ValueError("Failed to iterate over classes from field data")
+            raise ValueError("Failed to iterate over classes from field data") from error
 
         return field_classes
 
@@ -191,17 +191,17 @@ class FieldParser:
 
         try:
             field_input_type = self._data["type"]
-        except TypeError:
+        except TypeError as error:
             logger.error("Failed to get input type from field data")
-            raise ValueError("Failed to get input type from field data")
+            raise ValueError("Failed to get input type from field data") from error
         except KeyError:
             field_input_type = InputType.TEXT.value
 
         try:
             field_input_type = InputType(field_input_type)
-        except ValueError:
+        except ValueError as error:
             logger.error("Field data contain not supported input type")
-            raise ValueError("Field data contain not supported input type")
+            raise ValueError("Field data contain not supported input type") from error
 
         return field_input_type
 
@@ -215,9 +215,9 @@ class FieldParser:
 
         try:
             field_value = self._data["value"]
-        except TypeError:
+        except TypeError as error:
             logger.error("Failed to get value from field data")
-            raise ValueError("Failed to get value from field data")
+            raise ValueError("Failed to get value from field data") from error
         except KeyError:
             field_value = None
 
@@ -236,9 +236,9 @@ class FieldParser:
 
         try:
             field_title = self._data["title"]
-        except TypeError:
+        except TypeError as error:
             logger.error("Failed to get title from field data")
-            raise ValueError("Failed to get title from field data")
+            raise ValueError("Failed to get title from field data") from error
         except KeyError:
             field_title = None
 
