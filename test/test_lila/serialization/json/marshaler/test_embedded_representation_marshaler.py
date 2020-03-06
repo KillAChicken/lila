@@ -277,21 +277,40 @@ def test_non_iterable_sub_entities():
     assert error_info.value.args[0] == expected_message, "Wrong error"
 
 
-def test_non_marshalable_sub_entities(non_marshalable_sub_entity):
+@pytest.mark.parametrize(
+    argnames="sub_entity",
+    argvalues=[
+        EmbeddedLink(target="/embedded/link", relations=["relation"]),
+        EmbeddedRepresentation(relations=["relation"]),
+        ],
+    ids=[
+        "Link",
+        "Representation",
+        ],
+    )
+def test_non_marshalable_sub_entities(sub_entity):
     # pylint: disable=line-too-long
     """Test that ValueError is raised if one of sub-entities of the embedded representation is not marshallable.
 
-    1. Create an embedded representation marshaler for an object with a sub-entity that
-       can't be marshaled.
-    2. Try to call marshal_entities method.
-    3. Check that ValueError is raised.
-    4. Check the error message.
+    1. Create json marshaler that raises exception when either marshal_embedded_link or
+       marshal_embedded_representation is called.
+    2. Create an embedded representation marshaler.
+    3. Try to call marshal_entities method.
+    4. Check that ValueError is raised.
+    5. Check the error message.
     """
     # pylint: enable=line-too-long
+    class _SubEntityErrorMarshaler(JSONMarshaler):
+        def marshal_embedded_link(self, embedded_link):
+            raise Exception()
+
+        def marshal_embedded_representation(self, embedded_representation):
+            raise Exception()
+
     SubEntitiesRepresentation = namedtuple("SubEntitiesRepresentation", "entities")
     marshaler = RepresentationMarshaler(
-        marshaler=JSONMarshaler(),
-        embedded_representation=SubEntitiesRepresentation(entities=[non_marshalable_sub_entity]),
+        marshaler=_SubEntityErrorMarshaler(),
+        embedded_representation=SubEntitiesRepresentation(entities=[sub_entity]),
         )
     with pytest.raises(ValueError) as error_info:
         marshaler.marshal_entities()
@@ -395,22 +414,22 @@ def test_non_marshalable_links():
     # pylint: disable=line-too-long
     """Test that ValueError is raised if one of links of the embedded representation is not marshallable.
 
-    1. Create an embedded representation marshaler for an object with a link that
-       can't be marshaled.
-    2. Try to call marshal_links method.
-    3. Check that ValueError is raised.
-    4. Check the error message.
+    1. Create json marshaler that raises exception when marshal_link method is called.
+    2. Create an embedded representation marshaler.
+    3. Try to call marshal_links method.
+    4. Check that ValueError is raised.
+    5. Check the error message.
     """
     # pylint: enable=line-too-long
-    links = [
-        Link(relations=["first"], target="/first"),
-        None,
-        Link(relations=["last"], target="/last"),
-        ]
+    class _LinkErrorMarshaler(JSONMarshaler):
+        def marshal_link(self, link):
+            raise Exception()
 
     LinksRepresentation = namedtuple("LinksRepresentation", "links")
+
+    links = [Link(relations=["first"], target="/first")]
     marshaler = RepresentationMarshaler(
-        marshaler=JSONMarshaler(),
+        marshaler=_LinkErrorMarshaler(),
         embedded_representation=LinksRepresentation(links=links),
         )
     with pytest.raises(ValueError) as error_info:
@@ -503,15 +522,15 @@ def test_non_marshalable_actions():
     4. Check the error message.
     """
     # pylint: enable=line-too-long
-    actions = [
-        Action(name="first", target="/first"),
-        None,
-        Action(name="last", target="/last"),
-        ]
+    class _ActionErrorMarshaler(JSONMarshaler):
+        def marshal_action(self, action):
+            raise Exception()
 
     ActionsRepresentation = namedtuple("ActionsRepresentation", "actions")
+
+    actions = [Action(name="action", target="/action")]
     marshaler = RepresentationMarshaler(
-        marshaler=JSONMarshaler(),
+        marshaler=_ActionErrorMarshaler(),
         embedded_representation=ActionsRepresentation(actions=actions),
         )
     with pytest.raises(ValueError) as error_info:

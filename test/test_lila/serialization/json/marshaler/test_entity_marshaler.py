@@ -174,18 +174,39 @@ def test_non_iterable_sub_entities():
     )
 
 
-def test_non_marshalable_sub_entities(non_marshalable_sub_entity):
+@pytest.mark.parametrize(
+    argnames="sub_entity",
+    argvalues=[
+        EmbeddedLink(target="/embedded/link", relations=["relation"]),
+        EmbeddedRepresentation(relations=["relation"]),
+        ],
+    ids=[
+        "Link",
+        "Representation",
+        ],
+    )
+def test_non_marshalable_sub_entities(sub_entity):
     """Test that ValueError is raised if one of sub-entities of the entity is not marshallable.
 
-    1. Create an entity marshaler for an object with a sub-entity that can't be marshaled.
-    2. Try to call marshal_entities method.
-    3. Check that ValueError is raised.
-    4. Check the error message.
+    1. Create json marshaler that raises exception when either marshal_embedded_link or
+       marshal_embedded_representation is called.
+    2. Create an entity marshaler.
+    3. Try to call marshal_entities method.
+    4. Check that ValueError is raised.
+    5. Check the error message.
+       marshal_embedded_representation is called.
     """
+    class _SubEntityErrorMarshaler(JSONMarshaler):
+        def marshal_embedded_link(self, embedded_link):
+            raise Exception()
+
+        def marshal_embedded_representation(self, embedded_representation):
+            raise Exception()
+
     SubEntitiesEntity = namedtuple("SubEntitiesEntity", "entities")
     marshaler = EntityMarshaler(
-        marshaler=JSONMarshaler(),
-        entity=SubEntitiesEntity(entities=[non_marshalable_sub_entity]),
+        marshaler=_SubEntityErrorMarshaler(),
+        entity=SubEntitiesEntity(entities=[sub_entity]),
         )
     with pytest.raises(ValueError) as error_info:
         marshaler.marshal_entities()
@@ -280,19 +301,20 @@ def test_non_iterable_links():
 def test_non_marshalable_links():
     """Test that ValueError is raised if one of links of the entity is not marshallable.
 
-    1. Create an entity marshaler for an object with a link that can't be marshaled.
-    2. Try to call marshal_links method.
-    3. Check that ValueError is raised.
-    4. Check the error message.
+    1. Create json marshaler that raises exception when marshal_link method is called.
+    2. Create an entity marshaler.
+    3. Try to call marshal_links method.
+    4. Check that ValueError is raised.
+    5. Check the error message.
     """
-    links = [
-        Link(relations=["first"], target="/first"),
-        None,
-        Link(relations=["last"], target="/last"),
-        ]
+    class _LinkErrorMarshaler(JSONMarshaler):
+        def marshal_link(self, link):
+            raise Exception()
 
     LinksEntity = namedtuple("LinksEntity", "links")
-    marshaler = EntityMarshaler(marshaler=JSONMarshaler(), entity=LinksEntity(links=links))
+
+    links = [Link(relations=["first"], target="/first")]
+    marshaler = EntityMarshaler(marshaler=_LinkErrorMarshaler(), entity=LinksEntity(links=links))
     with pytest.raises(ValueError) as error_info:
         marshaler.marshal_links()
 
@@ -369,14 +391,17 @@ def test_non_marshalable_actions():
     3. Check that ValueError is raised.
     4. Check the error message.
     """
-    actions = [
-        Action(name="first", target="/first"),
-        None,
-        Action(name="last", target="/last"),
-        ]
+    class _ActionErrorMarshaler(JSONMarshaler):
+        def marshal_action(self, action):
+            raise Exception()
 
     ActionsEntity = namedtuple("ActionsEntity", "actions")
-    marshaler = EntityMarshaler(marshaler=JSONMarshaler(), entity=ActionsEntity(actions=actions))
+
+    actions = [Action(name="action", target="/action")]
+    marshaler = EntityMarshaler(
+        marshaler=_ActionErrorMarshaler(),
+        entity=ActionsEntity(actions=actions),
+        )
     with pytest.raises(ValueError) as error_info:
         marshaler.marshal_actions()
 

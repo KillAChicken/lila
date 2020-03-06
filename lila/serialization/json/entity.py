@@ -75,21 +75,29 @@ class EntityMarshaler:
         logger = logging.getLogger(__name__)
 
         entity = self._entity
-        marshaler = self._marshaler
-        marshal_sub_entity = lambda sub_entity: _marshal_sub_entity(sub_entity, marshaler)
         try:
-            entities = list(marshal_sub_entity(sub_entity) for sub_entity in entity.entities)
+            entity_sub_entities = list(entity.entities)
         except AttributeError as error:
             logger.error("Failed to get sub-entities of the entity")
             raise ValueError("Failed to get sub entities of the entity") from error
         except TypeError as error:
             logger.error("Failed to iterate over sub-entities of the entity")
             raise ValueError("Failed to iterate over sub entities of the entity") from error
-        except ValueError as error:
-            logger.error("Failed to marshal sub-entities of the entity")
-            raise ValueError("Failed to marshal sub entities of the entity") from error
 
-        return entities
+        marshaler = self._marshaler
+        marshal_sub_entity = lambda sub_entity: _marshal_sub_entity(sub_entity, marshaler)
+
+        marshaled_sub_entities = []
+        for sub_entity in entity_sub_entities:
+            try:
+                sub_entity_data = marshal_sub_entity(sub_entity)
+            except Exception as error:
+                logger.error("Failed to marshal sub-entities of the entity")
+                raise ValueError("Failed to marshal sub entities of the entity") from error
+
+            marshaled_sub_entities.append(sub_entity_data)
+
+        return marshaled_sub_entities
 
     def marshal_links(self):
         """Marshal entity's links.
@@ -100,20 +108,28 @@ class EntityMarshaler:
         logger = logging.getLogger(__name__)
 
         entity = self._entity
-        marshal_link = self._marshaler.marshal_link
         try:
-            links = list(marshal_link(link) for link in entity.links)
+            entity_links = list(entity.links)
         except AttributeError as error:
             logger.error("Failed to get entity's links")
             raise ValueError("Failed to get entity's links") from error
         except TypeError as error:
             logger.error("Failed to iterate over entity's links")
             raise ValueError("Failed to iterate over entity's links") from error
-        except ValueError as error:
-            logger.error("Failed to marshal entity's links")
-            raise ValueError("Failed to marshal entity's links") from error
 
-        return links
+        marshal_link = self._marshaler.marshal_link
+
+        marshaled_links = []
+        for link in entity_links:
+            try:
+                link_data = marshal_link(link)
+            except Exception as error:
+                logger.error("Failed to marshal entity's links")
+                raise ValueError("Failed to marshal entity's links") from error
+
+            marshaled_links.append(link_data)
+
+        return marshaled_links
 
     def marshal_actions(self):
         """Marshal entity's actions.
@@ -124,20 +140,27 @@ class EntityMarshaler:
         logger = logging.getLogger(__name__)
 
         entity = self._entity
-        marshal_action = self._marshaler.marshal_action
         try:
-            actions = list(marshal_action(action) for action in entity.actions)
+            entity_actions = list(entity.actions)
         except AttributeError as error:
             logger.error("Failed to get entity's actions")
             raise ValueError("Failed to get entity's actions") from error
         except TypeError as error:
             logger.error("Failed to iterate over entity's actions")
             raise ValueError("Failed to iterate over entity's actions") from error
-        except ValueError as error:
-            logger.error("Failed to marshal entity's actions")
-            raise ValueError("Failed to marshal entity's actions") from error
 
-        return actions
+        marshal_action = self._marshaler.marshal_action
+        marshaled_actions = []
+        for action in entity_actions:
+            try:
+                action_data = marshal_action(action)
+            except Exception as error:
+                logger.error("Failed to marshal entity's actions")
+                raise ValueError("Failed to marshal entity's actions") from error
+
+            marshaled_actions.append(action_data)
+
+        return marshaled_actions
 
     def marshal_title(self):
         """Marshal entity's title.
@@ -256,12 +279,8 @@ class EmbeddedRepresentationMarshaler:
         logger = logging.getLogger(__name__)
 
         embedded_representation = self._embedded_representation
-        marshaler = self._marshaler
-        marshal_sub_entity = lambda sub_entity: _marshal_sub_entity(sub_entity, marshaler)
         try:
-            entities = list(
-                marshal_sub_entity(entity) for entity in embedded_representation.entities
-                )
+            representation_sub_entities = list(embedded_representation.entities)
         except AttributeError as error:
             logger.error("Failed to get sub-entities of the embedded representation")
             raise ValueError("Failed to get sub entities of the embedded representation") from error
@@ -270,13 +289,23 @@ class EmbeddedRepresentationMarshaler:
             raise ValueError(
                 "Failed to iterate over sub entities of the embedded representation",
                 ) from error
-        except ValueError as error:
-            logger.error("Failed to marshal sub-entities of the embedded representation")
-            raise ValueError(
-                "Failed to marshal sub entities of the embedded representation",
-                ) from error
 
-        return entities
+        marshaler = self._marshaler
+        marshal_sub_entity = lambda sub_entity: _marshal_sub_entity(sub_entity, marshaler)
+
+        marshaled_sub_entities = []
+        for sub_entity in representation_sub_entities:
+            try:
+                sub_entity_data = marshal_sub_entity(sub_entity)
+            except Exception as error:
+                logger.error("Failed to marshal sub-entities of the embedded representation")
+                raise ValueError(
+                    "Failed to marshal sub entities of the embedded representation",
+                    ) from error
+
+            marshaled_sub_entities.append(sub_entity_data)
+
+        return marshaled_sub_entities
 
     def marshal_links(self):
         """Marshal links of the embedded representation.
@@ -287,9 +316,8 @@ class EmbeddedRepresentationMarshaler:
         logger = logging.getLogger(__name__)
 
         embedded_representation = self._embedded_representation
-        marshal_link = self._marshaler.marshal_link
         try:
-            links = list(marshal_link(link) for link in embedded_representation.links)
+            representation_links = list(embedded_representation.links)
         except AttributeError as error:
             logger.error("Failed to get links of the embedded representation")
             raise ValueError("Failed to get links of the embedded representation") from error
@@ -298,11 +326,22 @@ class EmbeddedRepresentationMarshaler:
             raise ValueError(
                 "Failed to iterate over links of the embedded representation",
                 ) from error
-        except ValueError as error:
-            logger.error("Failed to marshal links of the embedded representation")
-            raise ValueError("Failed to marshal links of the embedded representation") from error
 
-        return links
+        marshal_link = self._marshaler.marshal_link
+
+        marshaled_links = []
+        for link in representation_links:
+            try:
+                link_data = marshal_link(link)
+            except Exception as error:
+                logger.error("Failed to marshal links of the embedded representation")
+                raise ValueError(
+                    "Failed to marshal links of the embedded representation",
+                    ) from error
+
+            marshaled_links.append(link_data)
+
+        return marshaled_links
 
     def marshal_actions(self):
         """Marshal actions of the embedded representation.
@@ -313,9 +352,8 @@ class EmbeddedRepresentationMarshaler:
         logger = logging.getLogger(__name__)
 
         embedded_representation = self._embedded_representation
-        marshal_action = self._marshaler.marshal_action
         try:
-            actions = list(marshal_action(action) for action in embedded_representation.actions)
+            representation_actions = list(embedded_representation.actions)
         except AttributeError as error:
             logger.error("Failed to get actions of the embedded representation")
             raise ValueError("Failed to get actions of the embedded representation") from error
@@ -324,11 +362,22 @@ class EmbeddedRepresentationMarshaler:
             raise ValueError(
                 "Failed to iterate over actions of the embedded representation",
                 ) from error
-        except ValueError as error:
-            logger.error("Failed to marshal actions of the embedded representation")
-            raise ValueError("Failed to marshal actions of the embedded representation") from error
 
-        return actions
+        marshal_action = self._marshaler.marshal_action
+
+        marshaled_actions = []
+        for action in representation_actions:
+            try:
+                action_data = marshal_action(action)
+            except Exception as error:
+                logger.error("Failed to marshal actions of the embedded representation")
+                raise ValueError(
+                    "Failed to marshal actions of the embedded representation",
+                    ) from error
+
+            marshaled_actions.append(action_data)
+
+        return marshaled_actions
 
     def marshal_title(self):
         """Marshal title of the embedded representation.
