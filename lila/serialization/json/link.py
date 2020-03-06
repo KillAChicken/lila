@@ -1,8 +1,8 @@
-"""Module with default marshaler for a link."""
+"""Module with default marshaler and parser for a link and embedded link."""
 
 import logging
 
-from lila.core.link import Link
+from lila.core.link import Link, EmbeddedLink
 
 
 class LinkMarshaler:
@@ -358,3 +358,136 @@ class LinkParser:
             link_target_media_type = str(link_target_media_type)
 
         return link_target_media_type
+
+
+class EmbeddedLinkParser:
+    """Class to parse a single embedded link."""
+
+    def __init__(self, data):
+        self._data = data
+
+    def parse(self):
+        """Parse the embedded link.
+
+        :returns: :class:`EmbeddedLink <lila.core.link.Link>`.
+        """
+        return EmbeddedLink(
+            relations=self.parse_relations(),
+            classes=self.parse_classes(),
+            target=self.parse_target(),
+            title=self.parse_title(),
+            target_media_type=self.parse_target_media_type(),
+            )
+
+    def parse_relations(self):
+        """Parse relations of the embedded link.
+
+        :returns: list of string relations of the embedded link.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            embedded_link_relations = self._data["rel"]
+        except TypeError as error:
+            logger.error("Failed to get relations from data of embedded link")
+            raise ValueError("Failed to get relations from data of embedded link") from error
+        except KeyError as error:
+            logger.error("Data of embedded link do not have required 'rel' key")
+            raise ValueError("Data of embedded link do not have required 'rel' key") from error
+
+        try:
+            embedded_link_relations = tuple(str(relation) for relation in embedded_link_relations)
+        except TypeError as error:
+            logger.error("Failed to iterate over relations from data of embedded link")
+            raise ValueError(
+                "Failed to iterate over relations from data of embedded link",
+                ) from error
+
+        return embedded_link_relations
+
+    def parse_classes(self):
+        """Parse classes of the embedded link.
+
+        :returns: list with string names of classes of the embedded link.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            embedded_link_classes = self._data["class"]
+        except TypeError as error:
+            logger.error("Failed to get classes from data of embedded link")
+            raise ValueError("Failed to get classes from data of embedded link") from error
+        except KeyError:
+            embedded_link_classes = ()
+
+        try:
+            embedded_link_classes = tuple(str(class_) for class_ in embedded_link_classes)
+        except TypeError as error:
+            logger.error("Failed to iterate over classes from data of embedded link")
+            raise ValueError("Failed to iterate over classes from data of embedded link") from error
+
+        return embedded_link_classes
+
+    def parse_target(self):
+        """Parse target of the embedded link.
+
+        :returns: string target of the embedded link.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            embedded_link_target = self._data["href"]
+        except TypeError as error:
+            logger.error("Failed to get target from data of embedded link")
+            raise ValueError("Failed to get target from data of embedded link") from error
+        except KeyError as error:
+            logger.error("Data of embedded link do not have required 'href' key")
+            raise ValueError("Data of embedded link do not have required 'href' key") from error
+
+        return str(embedded_link_target)
+
+    def parse_title(self):
+        """Parse title of the embedded link.
+
+        :returns: string title of the embedded link or None.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            embedded_link_title = self._data["title"]
+        except TypeError as error:
+            logger.error("Failed to get title from data of embedded link")
+            raise ValueError("Failed to get title from data of embedded link") from error
+        except KeyError:
+            embedded_link_title = None
+
+        if embedded_link_title is not None:
+            embedded_link_title = str(embedded_link_title)
+
+        return embedded_link_title
+
+    def parse_target_media_type(self):
+        """Parse target media type of the embedded link.
+
+        :returns: string value of target media type of the embedded link or None.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            embedded_link_target_media_type = self._data["type"]
+        except TypeError as error:
+            logger.error("Failed to get target media type from data of embedded link")
+            raise ValueError(
+                "Failed to get target media type from data of embedded link",
+                ) from error
+        except KeyError:
+            embedded_link_target_media_type = None
+
+        if embedded_link_target_media_type is not None:
+            embedded_link_target_media_type = str(embedded_link_target_media_type)
+
+        return embedded_link_target_media_type
