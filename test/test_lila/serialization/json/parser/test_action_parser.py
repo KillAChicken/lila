@@ -1,4 +1,4 @@
-"""Test cases for a parser class for an action data."""
+"""Test cases for a parser class for action data."""
 
 import random
 

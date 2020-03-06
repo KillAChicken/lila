@@ -1,4 +1,4 @@
-"""Test cases for a parser class for a field data."""
+"""Test cases for a parser class for field data."""
 
 import random
 

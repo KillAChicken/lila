@@ -2,6 +2,8 @@
 
 import logging
 
+from lila.core.link import Link
+
 
 class LinkMarshaler:
     """Class to marshal a single link."""
@@ -227,3 +229,132 @@ class EmbeddedLinkMarshaler:
             target_media_type = str(target_media_type)
 
         return target_media_type
+
+
+class LinkParser:
+    """Class to parse a single link."""
+
+    def __init__(self, data):
+        self._data = data
+
+    def parse(self):
+        """Parse the link.
+
+        :returns: :class:`Link <lila.core.link.Link>`.
+        """
+        return Link(
+            relations=self.parse_relations(),
+            classes=self.parse_classes(),
+            target=self.parse_target(),
+            title=self.parse_title(),
+            target_media_type=self.parse_target_media_type(),
+            )
+
+    def parse_relations(self):
+        """Parse link's relations.
+
+        :returns: list of string relations of the link.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            link_relations = self._data["rel"]
+        except TypeError as error:
+            logger.error("Failed to get relations from link data")
+            raise ValueError("Failed to get relations from link data") from error
+        except KeyError as error:
+            logger.error("Link data do not have required 'rel' key")
+            raise ValueError("Link data do not have required 'rel' key") from error
+
+        try:
+            link_relations = tuple(str(relation) for relation in link_relations)
+        except TypeError as error:
+            logger.error("Failed to iterate over relations from link data")
+            raise ValueError("Failed to iterate over relations from link data") from error
+
+        return link_relations
+
+    def parse_classes(self):
+        """Parse link's classes.
+
+        :returns: list with string names of link's classes.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            link_classes = self._data["class"]
+        except TypeError as error:
+            logger.error("Failed to get classes from link data")
+            raise ValueError("Failed to get classes from link data") from error
+        except KeyError:
+            link_classes = ()
+
+        try:
+            link_classes = tuple(str(class_) for class_ in link_classes)
+        except TypeError as error:
+            logger.error("Failed to iterate over classes from link data")
+            raise ValueError("Failed to iterate over classes from link data") from error
+
+        return link_classes
+
+    def parse_target(self):
+        """Parse link's target.
+
+        :returns: string target of the link.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            link_target = self._data["href"]
+        except TypeError as error:
+            logger.error("Failed to get target from link data")
+            raise ValueError("Failed to get target from link data") from error
+        except KeyError as error:
+            logger.error("Link data do not have required 'href' key")
+            raise ValueError("Link data do not have required 'href' key") from error
+
+        return str(link_target)
+
+    def parse_title(self):
+        """Parse link's title.
+
+        :returns: string title of the link or None.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            link_title = self._data["title"]
+        except TypeError as error:
+            logger.error("Failed to get title from link data")
+            raise ValueError("Failed to get title from link data") from error
+        except KeyError:
+            link_title = None
+
+        if link_title is not None:
+            link_title = str(link_title)
+
+        return link_title
+
+    def parse_target_media_type(self):
+        """Parse link's target media type.
+
+        :returns: string value of link's target media type or None.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            link_target_media_type = self._data["type"]
+        except TypeError as error:
+            logger.error("Failed to get target media type from link data")
+            raise ValueError("Failed to get target media type from link data") from error
+        except KeyError:
+            link_target_media_type = None
+
+        if link_target_media_type is not None:
+            link_target_media_type = str(link_target_media_type)
+
+        return link_target_media_type
