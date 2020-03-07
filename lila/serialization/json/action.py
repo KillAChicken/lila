@@ -353,6 +353,7 @@ class ActionParser:
             except Exception as error:
                 logger.error("Failed to parse action's fields")
                 raise ValueError("Failed to parse action's fields") from error
+
             action_fields.append(field)
 
         return tuple(action_fields)

@@ -367,7 +367,7 @@ def test_fields(fields_data):
     """Test that fields are properly parsed.
 
     1. Create an action parser.
-    2. Replace parse_field of the parser so that it returns fake data.
+    2. Replace parse_field of the json parser so that it returns fake data.
     3. Parse fields.
     4. Check the parsed fields.
     """

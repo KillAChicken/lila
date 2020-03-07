@@ -194,7 +194,6 @@ def test_non_marshalable_sub_entities(sub_entity):
     3. Try to call marshal_entities method.
     4. Check that ValueError is raised.
     5. Check the error message.
-       marshal_embedded_representation is called.
     """
     class _SubEntityErrorMarshaler(JSONMarshaler):
         def marshal_embedded_link(self, embedded_link):

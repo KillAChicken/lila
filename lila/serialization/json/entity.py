@@ -3,6 +3,8 @@
 import logging
 import json
 
+from lila.core.entity import Entity
+
 
 class EntityMarshaler:
     """Class to marshal a single entity."""
@@ -398,6 +400,206 @@ class EmbeddedRepresentationMarshaler:
         return title
 
 
+class EntityParser:
+    """Class to parse a single entity."""
+
+    def __init__(self, data, parser):
+        self._data = data
+        self._parser = parser
+
+    def parse(self):
+        """Parse the entity.
+
+        :returns: :class:`Entity <lila.core.entity.Entity>`.
+        """
+        return Entity(
+            classes=self.parse_classes(),
+            properties=self.parse_properties(),
+            entities=self.parse_entities(),
+            links=self.parse_links(),
+            actions=self.parse_actions(),
+            title=self.parse_title(),
+            )
+
+    def parse_classes(self):
+        """Parse entity's classes.
+
+        :returns: list with string names of entity's classes.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            entity_classes = self._data["class"]
+        except TypeError as error:
+            logger.error("Failed to get classes from entity data")
+            raise ValueError("Failed to get classes from entity data") from error
+        except KeyError:
+            entity_classes = ()
+
+        try:
+            entity_classes = tuple(str(class_) for class_ in entity_classes)
+        except TypeError as error:
+            logger.error("Failed to iterate over classes from entity data")
+            raise ValueError("Failed to iterate over classes from entity data") from error
+
+        return entity_classes
+
+    def parse_properties(self):
+        """Parse entity's properties.
+
+        :returns: JSON object with entity's properties.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            entity_properties = self._data["properties"]
+        except TypeError as error:
+            logger.error("Failed to get properties from entity data")
+            raise ValueError("Failed to get properties from entity data") from error
+        except KeyError:
+            entity_properties = {}
+
+        try:
+            entity_properties = json.loads(json.dumps(entity_properties))
+        except TypeError as error:
+            logger.error("Failed to parse entity's properties")
+            raise ValueError("Failed to parse entity's properties") from error
+
+        return entity_properties
+
+    def parse_entities(self):
+        """Parse entity's sub-entities.
+
+        :returns: list with parsed entity's sub-entities.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            entity_sub_entities_data = self._data["entities"]
+        except TypeError as error:
+            logger.error("Failed to get sub-entities data from entity data")
+            raise ValueError("Failed to get sub-entities data from entity data") from error
+        except KeyError:
+            entity_sub_entities_data = ()
+
+        try:
+            entity_sub_entities_data = list(entity_sub_entities_data)
+        except TypeError as error:
+            logger.error("Failed to iterate over sub-entities data from entity data")
+            raise ValueError("Failed to iterate over sub-entities data from entity data") from error
+
+        parser = self._parser
+        parse_sub_entity = lambda data: _parse_sub_entity(data, parser)
+
+        entity_sub_entities = []
+        for data in entity_sub_entities_data:
+            try:
+                sub_entity = parse_sub_entity(data)
+            except Exception as error:
+                logger.error("Failed to parse entity's sub-entities")
+                raise ValueError("Failed to parse entity's sub-entities") from error
+
+            entity_sub_entities.append(sub_entity)
+
+        return tuple(entity_sub_entities)
+
+    def parse_links(self):
+        """Parse entity's links.
+
+        :returns: list with parsed entity's links.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            entity_links_data = self._data["links"]
+        except TypeError as error:
+            logger.error("Failed to get links data from entity data")
+            raise ValueError("Failed to get links data from entity data") from error
+        except KeyError:
+            entity_links_data = ()
+
+        try:
+            entity_links_data = list(entity_links_data)
+        except TypeError as error:
+            logger.error("Failed to iterate over links data from entity data")
+            raise ValueError("Failed to iterate over links data from entity data") from error
+
+        parse_link = self._parser.parse_link
+
+        entity_links = []
+        for data in entity_links_data:
+            try:
+                link = parse_link(data)
+            except Exception as error:
+                logger.error("Failed to parse entity's links")
+                raise ValueError("Failed to parse entity's links") from error
+
+            entity_links.append(link)
+
+        return tuple(entity_links)
+
+    def parse_actions(self):
+        """Parse entity's actions.
+
+        :returns: list with parsed entity's actions.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            entity_actions_data = self._data["actions"]
+        except TypeError as error:
+            logger.error("Failed to get actions data from entity data")
+            raise ValueError("Failed to get actions data from entity data") from error
+        except KeyError:
+            entity_actions_data = ()
+
+        try:
+            entity_actions_data = list(entity_actions_data)
+        except TypeError as error:
+            logger.error("Failed to iterate over actions data from entity data")
+            raise ValueError("Failed to iterate over actions data from entity data") from error
+
+        parse_action = self._parser.parse_action
+
+        entity_actions = []
+        for data in entity_actions_data:
+            try:
+                action = parse_action(data)
+            except Exception as error:
+                logger.error("Failed to parse entity's actions")
+                raise ValueError("Failed to parse entity's actions") from error
+
+            entity_actions.append(action)
+
+        return tuple(entity_actions)
+
+    def parse_title(self):
+        """Parse entity's title.
+
+        :returns: string title of the entity or None.
+        :raises: :class:ValueError.
+        """
+        logger = logging.getLogger(__name__)
+
+        try:
+            entity_title = self._data["title"]
+        except TypeError as error:
+            logger.error("Failed to get title from entity data")
+            raise ValueError("Failed to get title from entity data") from error
+        except KeyError:
+            entity_title = None
+
+        if entity_title is not None:
+            entity_title = str(entity_title)
+
+        return entity_title
+
+
 def _marshal_sub_entity(sub_entity, marshaler):
     """Marshal the sub-entity.
 
@@ -416,3 +618,23 @@ def _marshal_sub_entity(sub_entity, marshaler):
         marshaled_sub_entity = marshaler.marshal_embedded_link(sub_entity)
 
     return marshaled_sub_entity
+
+
+def _parse_sub_entity(data, parser):
+    """Parse the sub-entity.
+
+    :param data: dictionary with sub-entity data.
+    :param parser: parser of the Siren entities.
+    :returns: parsed sub-entity.
+    :raises: :class:ValueError.
+    """
+    logger = logging.getLogger(__name__)
+
+    if "href" in data:
+        logger.debug("Parse data as for an embedded representation")
+        parsed_sub_entity = parser.parse_embedded_link(data)
+    else:
+        logger.debug("Parse data as for an embedded link")
+        parsed_sub_entity = parser.parse_embedded_representation(data)
+
+    return parsed_sub_entity
