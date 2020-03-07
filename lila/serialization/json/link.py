@@ -390,18 +390,18 @@ class EmbeddedLinkParser:
         try:
             embedded_link_relations = self._data["rel"]
         except TypeError as error:
-            logger.error("Failed to get relations from data of embedded link")
-            raise ValueError("Failed to get relations from data of embedded link") from error
+            logger.error("Failed to get relations from data of the embedded link")
+            raise ValueError("Failed to get relations from data of the embedded link") from error
         except KeyError as error:
-            logger.error("Data of embedded link do not have required 'rel' key")
-            raise ValueError("Data of embedded link do not have required 'rel' key") from error
+            logger.error("Data of the embedded link do not have required 'rel' key")
+            raise ValueError("Data of the embedded link do not have required 'rel' key") from error
 
         try:
             embedded_link_relations = tuple(str(relation) for relation in embedded_link_relations)
         except TypeError as error:
-            logger.error("Failed to iterate over relations from data of embedded link")
+            logger.error("Failed to iterate over relations from data of the embedded link")
             raise ValueError(
-                "Failed to iterate over relations from data of embedded link",
+                "Failed to iterate over relations from data of the embedded link",
                 ) from error
 
         return embedded_link_relations
@@ -416,16 +416,18 @@ class EmbeddedLinkParser:
         try:
             embedded_link_classes = self._data["class"]
         except TypeError as error:
-            logger.error("Failed to get classes from data of embedded link")
-            raise ValueError("Failed to get classes from data of embedded link") from error
+            logger.error("Failed to get classes from data of the embedded link")
+            raise ValueError("Failed to get classes from data of the embedded link") from error
         except KeyError:
             embedded_link_classes = ()
 
         try:
             embedded_link_classes = tuple(str(class_) for class_ in embedded_link_classes)
         except TypeError as error:
-            logger.error("Failed to iterate over classes from data of embedded link")
-            raise ValueError("Failed to iterate over classes from data of embedded link") from error
+            logger.error("Failed to iterate over classes from data of the embedded link")
+            raise ValueError(
+                "Failed to iterate over classes from data of the embedded link",
+                ) from error
 
         return embedded_link_classes
 
@@ -440,11 +442,11 @@ class EmbeddedLinkParser:
         try:
             embedded_link_target = self._data["href"]
         except TypeError as error:
-            logger.error("Failed to get target from data of embedded link")
-            raise ValueError("Failed to get target from data of embedded link") from error
+            logger.error("Failed to get target from data of the embedded link")
+            raise ValueError("Failed to get target from data of the embedded link") from error
         except KeyError as error:
-            logger.error("Data of embedded link do not have required 'href' key")
-            raise ValueError("Data of embedded link do not have required 'href' key") from error
+            logger.error("Data of the embedded link do not have required 'href' key")
+            raise ValueError("Data of the embedded link do not have required 'href' key") from error
 
         return str(embedded_link_target)
 
@@ -459,8 +461,8 @@ class EmbeddedLinkParser:
         try:
             embedded_link_title = self._data["title"]
         except TypeError as error:
-            logger.error("Failed to get title from data of embedded link")
-            raise ValueError("Failed to get title from data of embedded link") from error
+            logger.error("Failed to get title from data of the embedded link")
+            raise ValueError("Failed to get title from data of the embedded link") from error
         except KeyError:
             embedded_link_title = None
 
@@ -480,9 +482,9 @@ class EmbeddedLinkParser:
         try:
             embedded_link_target_media_type = self._data["type"]
         except TypeError as error:
-            logger.error("Failed to get target media type from data of embedded link")
+            logger.error("Failed to get target media type from data of the embedded link")
             raise ValueError(
-                "Failed to get target media type from data of embedded link",
+                "Failed to get target media type from data of the embedded link",
                 ) from error
         except KeyError:
             embedded_link_target_media_type = None

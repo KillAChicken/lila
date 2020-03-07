@@ -1,4 +1,4 @@
-"""Test cases for a parser class for link data."""
+"""Test cases for a parser class for data of embedded link."""
 
 import pytest
 
@@ -17,7 +17,7 @@ def test_unobtainable_relations():
     with pytest.raises(ValueError) as error_info:
         EmbeddedLinkParser(data=None).parse_relations()
 
-    assert error_info.value.args[0] == "Failed to get relations from data of embedded link", (
+    assert error_info.value.args[0] == "Failed to get relations from data of the embedded link", (
         "Wrong error"
         )
 
@@ -33,7 +33,7 @@ def test_missing_relations():
     with pytest.raises(ValueError) as error_info:
         EmbeddedLinkParser(data={}).parse_relations()
 
-    assert error_info.value.args[0] == "Data of embedded link do not have required 'rel' key", (
+    assert error_info.value.args[0] == "Data of the embedded link do not have required 'rel' key", (
         "Wrong error"
         )
 
@@ -42,7 +42,7 @@ def test_non_iterable_relations():
     # pylint: disable=line-too-long
     """Test that ValueError is raised if data of embedded link has a non-iterable object for relations.
 
-    1. Create a link parser for a dictionary with non-iterable relations.
+    1. Create an embedded link parser for a dictionary with non-iterable relations.
     2. Try to call parse_relations method.
     3. Check that ValueError is raised.
     4. Check the error message.
@@ -51,7 +51,7 @@ def test_non_iterable_relations():
     with pytest.raises(ValueError) as error_info:
         EmbeddedLinkParser(data={"rel": None}).parse_relations()
 
-    expected_message = "Failed to iterate over relations from data of embedded link"
+    expected_message = "Failed to iterate over relations from data of the embedded link"
     assert error_info.value.args[0] == expected_message, "Wrong error"
 
 
@@ -93,7 +93,7 @@ def test_unobtainable_classes():
     with pytest.raises(ValueError) as error_info:
         EmbeddedLinkParser(data=None).parse_classes()
 
-    assert error_info.value.args[0] == "Failed to get classes from data of embedded link", (
+    assert error_info.value.args[0] == "Failed to get classes from data of the embedded link", (
         "Wrong error"
         )
 
@@ -111,7 +111,7 @@ def test_non_iterable_classes():
     with pytest.raises(ValueError) as error_info:
         EmbeddedLinkParser(data={"class": None}).parse_classes()
 
-    expected_message = "Failed to iterate over classes from data of embedded link"
+    expected_message = "Failed to iterate over classes from data of the embedded link"
     assert error_info.value.args[0] == expected_message, "Wrong error"
 
 
@@ -165,7 +165,7 @@ def test_unobtainable_target():
     with pytest.raises(ValueError) as error_info:
         EmbeddedLinkParser(data=None).parse_target()
 
-    assert error_info.value.args[0] == "Failed to get target from data of embedded link", (
+    assert error_info.value.args[0] == "Failed to get target from data of the embedded link", (
         "Wrong error"
         )
 
@@ -181,9 +181,8 @@ def test_missing_target():
     with pytest.raises(ValueError) as error_info:
         EmbeddedLinkParser(data={}).parse_target()
 
-    assert error_info.value.args[0] == "Data of embedded link do not have required 'href' key", (
-        "Wrong error"
-        )
+    expected_message = "Data of the embedded link do not have required 'href' key"
+    assert error_info.value.args[0] == expected_message, "Wrong error"
 
 
 @pytest.mark.parametrize(
@@ -221,7 +220,7 @@ def test_unobtainable_title():
     with pytest.raises(ValueError) as error_info:
         EmbeddedLinkParser(data=None).parse_title()
 
-    assert error_info.value.args[0] == "Failed to get title from data of embedded link", (
+    assert error_info.value.args[0] == "Failed to get title from data of the embedded link", (
         "Wrong error"
         )
 
@@ -276,7 +275,7 @@ def test_unobtainable_target_media_type():
     with pytest.raises(ValueError) as error_info:
         EmbeddedLinkParser(data=None).parse_target_media_type()
 
-    expected_message = "Failed to get target media type from data of embedded link"
+    expected_message = "Failed to get target media type from data of the embedded link"
     assert error_info.value.args[0] == expected_message, "Wrong error"
 
 
