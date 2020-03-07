@@ -276,7 +276,7 @@ def test_custom_embedded_representation_marshaler():
         embedded_representation=EmbeddedRepresentation(relations=["self"]),
         )
     assert marshaled_representation == "Custom marshaled embedded representation", (
-        "Wrong data of the embedded link"
+        "Wrong data of the embedded representation"
         )
 
 

@@ -49,7 +49,6 @@ class JSONMarshaler(Marshaler):
 
         :param field: Siren Field.
         :returns: dictionary with field data.
-        :raises: :class:ValueError.
         """
         logger = logging.getLogger(__name__)
         logger.debug("Try to marshal a field '%s'", field)

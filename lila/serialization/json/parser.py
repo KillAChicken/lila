@@ -1,373 +1,156 @@
 """Module with JSON parser for Siren objects."""
 
 import logging
-import json
 
-from lila.core.field import InputType, Field
-from lila.core.action import Method, Action
-from lila.core.link import Link, EmbeddedLink
-from lila.core.entity import Entity, EmbeddedRepresentation
 from lila.serialization.parser import Parser
+from lila.serialization.json.field import FieldParser
+from lila.serialization.json.action import ActionParser
+from lila.serialization.json.link import LinkParser, EmbeddedLinkParser
+from lila.serialization.json.entity import EntityParser, EmbeddedRepresentationParser
 
 
 class JSONParser(Parser):
     """Class to parse Siren objects from JSON."""
 
+    create_field_parser = FieldParser
+    create_link_parser = LinkParser
+    create_embedded_link_parser = EmbeddedLinkParser
+
+    def create_action_parser(self, data):
+        """Factory method to create a parser for an action.
+
+        :param data: action data to parse.
+        :returns: :class:`ActionParser <lila.serialization.json.action.ActionParser>`.
+        """
+        return ActionParser(data=data, parser=self)
+
+    def create_entity_parser(self, data):
+        """Factory method to create a parser for an entity.
+
+        :param data: entity data to parse.
+        :returns: :class:`EntityParser <lila.serialization.json.entity.EntityParser>`.
+        """
+        return EntityParser(data=data, parser=self)
+
+    def create_embedded_representation_parser(self, data):
+        """Factory method to create a parser for an embedded representation.
+
+        :param data: data of embedded representation to parse.
+        :returns: :class:`EmbeddedRepresentationParser
+            <lila.serialization.json.entity.EmbeddedRepresentationParser>`.
+        """
+        return EmbeddedRepresentationParser(data=data, parser=self)
+
     def parse_field(self, data):
         """Parse serialized Siren field.
 
         :param data: serialized field.
-        :returns: :class:`Field <lila.core.field.Field>`.
-        :raises: :class:ValueError.
+        :returns: parsed field.
         """
-        data = _ensure_json(data)
-
         logger = logging.getLogger(__name__)
-        logger.debug("Try to parse a field from '%s'", data)
+        logger.debug("Try to parse a field from data '%s'", data)
 
+        parser = self.create_field_parser(data)
         try:
-            name = data["name"]
-        except KeyError:
-            logger.error("Failed to parse a field: data do not have required 'name' key")
-            raise ValueError("Field data do not have required 'name' key")
-
-        classes = data.get("class", ())
-
-        input_type_value = str(data.get("type", InputType.TEXT.value))
-        try:
-            input_type = InputType(input_type_value)
-        except ValueError:
-            logger.error("Failed to parse a field: unsupported input type is specified")
-            raise ValueError("Unsupported input type is specified")
-
-        value = data.get("value", None)
-        title = data.get("title", None)
-
-        try:
-            field = Field(
-                name=name,
-                classes=classes,
-                input_type=input_type,
-                value=value,
-                title=title,
-                )
-        except ValueError:
-            logger.error("Failed to create a field with the provided data")
+            parsed_field = parser.parse()
+        except Exception:
+            logger.error("Failed to parse a field")
             raise
 
         logger.info("Successfully parsed a field")
-        return field
+        return parsed_field
 
     def parse_action(self, data):
         """Parse serialized Siren action.
 
         :param data: serialized action.
-        :returns: :class:`Action <lila.core.action.Action>`.
-        :raises: :class:ValueError.
+        :returns: parsed action.
         """
-        data = _ensure_json(data)
-
         logger = logging.getLogger(__name__)
-        logger.debug("Try to parse an action from '%s'", data)
+        logger.debug("Try to parse an action from data '%s'", data)
 
+        parser = self.create_action_parser(data)
         try:
-            name = data["name"]
-        except KeyError:
-            logger.error("Failed to parse an action: data do not have required 'name' key")
-            raise ValueError("Action data do not have required 'name' key")
-
-        classes = data.get("class", ())
-
-        method_value = str(data.get("method", Method.GET.value))
-        try:
-            method = Method(method_value)
-        except ValueError:
-            logger.error("Failed to parse an action: unsupported method is specified")
-            raise ValueError("Unsupported method is specified")
-
-        try:
-            target = data["href"]
-        except KeyError:
-            logger.error("Failed to parse an action: data do not have required 'href' key")
-            raise ValueError("Action data do not have required 'href' key")
-
-        title = data.get("title", None)
-        encoding_type = data.get("type", None)
-
-        fields_data = data.get("fields", ())
-        try:
-            fields = [self.parse_field(field_data) for field_data in fields_data]
-        except (TypeError, ValueError) as error:
-            logger.error("Failed to parse an action: failed to parse fields")
-            raise ValueError("Failed to parse action fields") from error
-
-        try:
-            action = Action(
-                name=name,
-                classes=classes,
-                method=method,
-                target=target,
-                title=title,
-                encoding_type=encoding_type,
-                fields=fields,
-                )
-        except ValueError:
-            logger.error("Failed to create an action with the provided data")
+            parsed_action = parser.parse()
+        except Exception:
+            logger.error("Failed to parse an action")
             raise
 
         logger.info("Successfully parsed an action")
-        return action
+        return parsed_action
 
     def parse_link(self, data):
         """Parse serialized Siren link.
 
         :param data: serialized link.
-        :returns: :class:`Link <lila.core.link.Link>`.
-        :raises: :class:ValueError.
+        :returns: parsed link.
         """
-        data = _ensure_json(data)
-
         logger = logging.getLogger(__name__)
-        logger.debug("Try to parse a link from '%s'", data)
+        logger.debug("Try to parse a link from data '%s'", data)
 
+        parser = self.create_link_parser(data)
         try:
-            relations = data["rel"]
-        except KeyError:
-            logger.error("Failed to parse a link: data do not have required 'rel' key")
-            raise ValueError("Link data do not have required 'rel' key")
-
-        classes = data.get("class", ())
-
-        try:
-            target = data["href"]
-        except KeyError:
-            logger.error("Failed to parse a link: data do not have required 'href' key")
-            raise ValueError("Link data do not have required 'href' key")
-
-        title = data.get("title", None)
-        target_media_type = data.get("type", None)
-
-        try:
-            link = Link(
-                relations=relations,
-                classes=classes,
-                target=target,
-                title=title,
-                target_media_type=target_media_type,
-                )
-        except ValueError:
-            logger.error("Failed to create a link with the provided data")
+            parsed_link = parser.parse()
+        except Exception:
+            logger.error("Failed to parse a link")
             raise
 
         logger.info("Successfully parsed a link")
-        return link
+        return parsed_link
 
     def parse_embedded_link(self, data):
-        """Parse serialized embedded Siren link.
+        """Parse serialized Siren embedded link.
 
         :param data: serialized embedded link.
-        :returns: :class:`EmbeddedLink <lila.core.link.EmbeddedLink>`.
-        :raises: :class:ValueError.
+        :returns: parsed embedded link.
         """
-        data = _ensure_json(data)
-
         logger = logging.getLogger(__name__)
-        logger.debug("Try to parse an embedded link from '%s'", data)
+        logger.debug("Try to parse an embedded link from data '%s'", data)
 
+        parser = self.create_embedded_link_parser(data)
         try:
-            relations = data["rel"]
-        except KeyError:
-            logger.error("Failed to parse an embedded link: data do not have required 'rel' key")
-            raise ValueError("Embedded link data do not have required 'rel' key")
-
-        classes = data.get("class", ())
-
-        try:
-            target = data["href"]
-        except KeyError:
-            logger.error("Failed to parse an embedded link: data do not have required 'href' key")
-            raise ValueError("Embedded link data do not have required 'href' key")
-
-        title = data.get("title", None)
-        target_media_type = data.get("type", None)
-
-        try:
-            embedded_link = EmbeddedLink(
-                relations=relations,
-                classes=classes,
-                target=target,
-                title=title,
-                target_media_type=target_media_type,
-                )
-        except ValueError:
-            logger.error("Failed to create an embedded link with the provided data")
+            parsed_embedded_link = parser.parse()
+        except Exception:
+            logger.error("Failed to parse an embedded link")
             raise
 
         logger.info("Successfully parsed an embedded link")
-        return embedded_link
-
-    def parse_entity(self, data):
-        """Parse serialized Siren entity.
-
-        :param data: serialized entity.
-        :returns: :class:`Entity <lila.core.entity.Entity>`.
-        :raises: :class:ValueError.
-        """
-        data = _ensure_json(data)
-
-        logger = logging.getLogger(__name__)
-        logger.debug("Try to parse an entity from '%s'", data)
-
-        classes = data.get("class", ())
-        properties = data.get("properties", {})
-
-        sub_entities_data = data.get("entities", ())
-        try:
-            sub_entities = [
-                self._parse_sub_entity(sub_entity_data) for sub_entity_data in sub_entities_data
-                ]
-        except (TypeError, ValueError) as error:
-            logger.error("Failed to parse an entity: failed to parse sub entities")
-            raise ValueError("Failed to parse sub entities of entity") from error
-
-        links_data = data.get("links", ())
-        try:
-            links = [self.parse_link(link_data) for link_data in links_data]
-        except (TypeError, ValueError) as error:
-            logger.error("Failed to parse an entity: failed to parse links")
-            raise ValueError("Failed to parse entity links") from error
-
-        actions_data = data.get("actions", ())
-        try:
-            actions = [self.parse_action(action_data) for action_data in actions_data]
-        except (TypeError, ValueError) as error:
-            logger.error("Failed to parse an entity: failed to parse actions")
-            raise ValueError("Failed to parse entity actions") from error
-
-        title = data.get("title", None)
-
-        try:
-            entity = Entity(
-                classes=classes,
-                properties=properties,
-                entities=sub_entities,
-                links=links,
-                actions=actions,
-                title=title,
-                )
-        except ValueError:
-            logger.error("Failed to create an entity with the provided data")
-            raise
-
-        logger.info("Successfully parsed an entity")
-        return entity
+        return parsed_embedded_link
 
     def parse_embedded_representation(self, data):
         """Parse serialized Siren embedded representation.
 
         :param data: serialized embedded representation.
-        :returns: :class:`Entity <lila.core.entity.EmbeddedRepresentation>`.
-        :raises: :class:ValueError.
+        :returns: parsed embedded representation.
         """
-        data = _ensure_json(data)
-
         logger = logging.getLogger(__name__)
-        logger.debug("Try to parse an embedded representation from '%s'", data)
+        logger.debug("Try to parse an embedded representation from data '%s'", data)
 
-        classes = data.get("class", ())
-        properties = data.get("properties", {})
-
+        parser = self.create_embedded_representation_parser(data)
         try:
-            relations = data["rel"]
-        except KeyError:
-            logger.error(
-                "Failed to parse an embedded representation: data do not have required 'rel' key",
-                )
-            raise ValueError("Embedded representation data do not have required 'rel' key")
+            parsed_representation = parser.parse()
+        except Exception:
+            logger.error("Failed to parse an embedded representation")
+            raise
 
-        sub_entities_data = data.get("entities", ())
+        logger.info("Successfully parsed an embedded representation")
+        return parsed_representation
+
+    def parse_entity(self, data):
+        """Parse serialized Siren entity.
+
+        :param data: serialized entity.
+        :returns: parsed entity.
+        """
+        logger = logging.getLogger(__name__)
+        logger.debug("Try to parse an entity from data '%s'", data)
+
+        parser = self.create_entity_parser(data)
         try:
-            sub_entities = [
-                self._parse_sub_entity(sub_entity_data) for sub_entity_data in sub_entities_data
-                ]
-        except (TypeError, ValueError) as error:
-            logger.error("Failed to parse an embedded representation: failed to parse sub entities")
-            raise ValueError("Failed to parse sub entities of embedded representation") from error
-
-        links_data = data.get("links", ())
-        try:
-            links = [self.parse_link(link_data) for link_data in links_data]
-        except (TypeError, ValueError) as error:
-            logger.error("Failed to parse an embedded representation: failed to parse links")
-            raise ValueError("Failed to parse links of embedded representation") from error
-
-        actions_data = data.get("actions", ())
-        try:
-            actions = [self.parse_action(action_data) for action_data in actions_data]
-        except (TypeError, ValueError) as error:
-            logger.error("Failed to parse an embedded representation: failed to parse actions")
-            raise ValueError("Failed to parse actions of embedded representation") from error
-
-        title = data.get("title", None)
-
-        try:
-            embedded_representation = EmbeddedRepresentation(
-                relations=relations,
-                classes=classes,
-                properties=properties,
-                entities=sub_entities,
-                links=links,
-                actions=actions,
-                title=title,
-                )
-        except ValueError:
-            logger.error("Failed to create an embedded representation with the provided data")
+            parsed_entity = parser.parse()
+        except Exception:
+            logger.error("Failed to parse an entity")
             raise
 
         logger.info("Successfully parsed an entity")
-        return embedded_representation
-
-    def _parse_sub_entity(self, data):
-        """Parse serialized sub entity.
-
-        :param data: serialized sub entity.
-        :returns: depending on the data either
-            :class:`Entity <lila.core.entity.EmbeddedRepresentation>`
-            or
-            :class:`EmbeddedLink <lila.core.link.EmbeddedLink>`.
-        :raises: :class:ValueError.
-        """
-        logger = logging.getLogger(__name__)
-        logger.debug("Try to parse sub entity")
-        try:
-            data["href"]
-        except KeyError:
-            logger.debug("Parse sub entity as an embedded representation")
-            sub_entity = self.parse_embedded_representation(data=data)
-        except TypeError as error:
-            logger.error("Failed to parse sub entity: sub entity data are not a dictionary")
-            raise ValueError("Sub entity data are not a dictionary") from error
-        else:
-            logger.debug("Parse sub entity as an embedded link")
-            sub_entity = self.parse_embedded_link(data=data)
-
-        logger.debug("Successfully parsed sub entity")
-        return sub_entity
-
-
-def _ensure_json(data):
-    """Convert data into JSON object (dictionary or list).
-
-    :param data: data to convert.
-    :returns: JSON object.
-    """
-    logger = logging.getLogger(__name__)
-    logger.debug("Ensure that data are a valid JSON object")
-    try:
-        adjusted_data = json.loads(json.dumps(data))
-    except TypeError as error:
-        logger.error("Specified data are not a valid JSON object")
-        raise ValueError("Specified data are not a valid JSON object") from error
-
-    logger.debug("Ensured that data are a valid JSON object")
-    return adjusted_data
+        return parsed_entity
