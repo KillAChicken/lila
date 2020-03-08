@@ -153,7 +153,7 @@ def test_missing_sub_entities():
     with pytest.raises(ValueError) as error_info:
         marshaler.marshal_entities()
 
-    assert error_info.value.args[0] == "Failed to get sub entities of the entity", "Wrong error"
+    assert error_info.value.args[0] == "Failed to get sub-entities of the entity", "Wrong error"
 
 
 def test_non_iterable_sub_entities():
@@ -169,7 +169,7 @@ def test_non_iterable_sub_entities():
     with pytest.raises(ValueError) as error_info:
         marshaler.marshal_entities()
 
-    assert error_info.value.args[0] == "Failed to iterate over sub entities of the entity", (
+    assert error_info.value.args[0] == "Failed to iterate over sub-entities of the entity", (
         "Wrong error"
     )
 
@@ -210,7 +210,7 @@ def test_non_marshalable_sub_entities(sub_entity):
     with pytest.raises(ValueError) as error_info:
         marshaler.marshal_entities()
 
-    assert error_info.value.args[0] == "Failed to marshal sub entities of the entity", "Wrong error"
+    assert error_info.value.args[0] == "Failed to marshal sub-entities of the entity", "Wrong error"
 
 
 @pytest.mark.parametrize(

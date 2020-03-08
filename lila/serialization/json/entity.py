@@ -81,10 +81,10 @@ class EntityMarshaler:
             entity_sub_entities = list(entity.entities)
         except AttributeError as error:
             logger.error("Failed to get sub-entities of the entity")
-            raise ValueError("Failed to get sub entities of the entity") from error
+            raise ValueError("Failed to get sub-entities of the entity") from error
         except TypeError as error:
             logger.error("Failed to iterate over sub-entities of the entity")
-            raise ValueError("Failed to iterate over sub entities of the entity") from error
+            raise ValueError("Failed to iterate over sub-entities of the entity") from error
 
         marshaler = self._marshaler
         marshal_sub_entity = lambda sub_entity: _marshal_sub_entity(sub_entity, marshaler)
@@ -95,7 +95,7 @@ class EntityMarshaler:
                 sub_entity_data = marshal_sub_entity(sub_entity)
             except Exception as error:
                 logger.error("Failed to marshal sub-entities of the entity")
-                raise ValueError("Failed to marshal sub entities of the entity") from error
+                raise ValueError("Failed to marshal sub-entities of the entity") from error
 
             marshaled_sub_entities.append(sub_entity_data)
 
@@ -285,11 +285,11 @@ class EmbeddedRepresentationMarshaler:
             representation_sub_entities = list(embedded_representation.entities)
         except AttributeError as error:
             logger.error("Failed to get sub-entities of the embedded representation")
-            raise ValueError("Failed to get sub entities of the embedded representation") from error
+            raise ValueError("Failed to get sub-entities of the embedded representation") from error
         except TypeError as error:
             logger.error("Failed to iterate over sub-entities of the embedded representation")
             raise ValueError(
-                "Failed to iterate over sub entities of the embedded representation",
+                "Failed to iterate over sub-entities of the embedded representation",
                 ) from error
 
         marshaler = self._marshaler
@@ -302,7 +302,7 @@ class EmbeddedRepresentationMarshaler:
             except Exception as error:
                 logger.error("Failed to marshal sub-entities of the embedded representation")
                 raise ValueError(
-                    "Failed to marshal sub entities of the embedded representation",
+                    "Failed to marshal sub-entities of the embedded representation",
                     ) from error
 
             marshaled_sub_entities.append(sub_entity_data)
