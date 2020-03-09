@@ -877,11 +877,11 @@ def _marshal_sub_entity(sub_entity, marshaler):
     logger = logging.getLogger(__name__)
 
     if hasattr(sub_entity, "target"):
-        logger.debug("Marshal sub-entity as an embedded representation")
-        marshaled_sub_entity = marshaler.marshal_embedded_representation(sub_entity)
-    else:
         logger.debug("Marshal sub-entity as an embedded link")
         marshaled_sub_entity = marshaler.marshal_embedded_link(sub_entity)
+    else:
+        logger.debug("Marshal sub-entity as an embedded representation")
+        marshaled_sub_entity = marshaler.marshal_embedded_representation(sub_entity)
 
     return marshaled_sub_entity
 

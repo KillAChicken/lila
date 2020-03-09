@@ -246,19 +246,26 @@ def test_non_marshalable_sub_entities(sub_entity):
 def test_sub_entities(sub_entities):
     """Test that sub-entities are properly marshaled.
 
-    1. Create an entity marshaler.
-    2. Replace marshal_embedded_link and marshal_embedded_representation of the marshaler
-       so that it returns fake data.
+    1. Create json marshaler with overridden marshal_embedded_link and
+       marshal_embedded_representation.
+    2. Create an entity marshaler.
     3. Marshal sub-entities.
     4. Check the marshaled sub-entities.
     """
-    json_marshaler = JSONMarshaler()
-    json_marshaler.marshal_embedded_link = sub_entities.index
-    json_marshaler.marshal_embedded_representation = sub_entities.index
+    class _SubEntitiesMarshaler(JSONMarshaler):
+        def marshal_embedded_link(self, embedded_link):
+            if not hasattr(embedded_link, "target"):
+                pytest.fail("Try to mershal embedded link instead of embedded representation")
+            return sub_entities.index(embedded_link)
+
+        def marshal_embedded_representation(self, embedded_representation):
+            if hasattr(embedded_representation, "target"):
+                pytest.fail("Try to marshal embedded representation instead of embedded link")
+            return sub_entities.index(embedded_representation)
 
     SubEntitiesEntity = namedtuple("SubEntitiesEntity", "entities")
     marshaler = EntityMarshaler(
-        marshaler=json_marshaler,
+        marshaler=_SubEntitiesMarshaler(),
         entity=SubEntitiesEntity(entities=sub_entities),
         )
 
