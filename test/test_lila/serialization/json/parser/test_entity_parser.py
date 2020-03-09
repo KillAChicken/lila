@@ -484,7 +484,7 @@ def test_title(title, expected_title):
     assert actual_title == expected_title, "Wrong title"
 
 
-def test_parse():
+def test_parse(component_validator):
     """Test that entity data is properly parsed.
 
     1. Create an entity.
@@ -514,11 +514,4 @@ def test_parse():
     parser.parse_title = lambda: entity.title
 
     actual_entity = parser.parse()
-    assert actual_entity.classes == entity.classes, "Entity classes are not properly parsed"
-    assert actual_entity.properties == entity.properties, (
-        "Entity properties are not properly parsed"
-        )
-    assert actual_entity.title == entity.title, "Entity title is not properly parsed"
-    assert actual_entity.entities == entity.entities, "Entity sub-entities are not properly parsed"
-    assert actual_entity.links == entity.links, "Entity links are not properly parsed"
-    assert actual_entity.actions == entity.actions, "Entity actions are not properly parsed"
+    component_validator.validate_entity(actual_entity, entity)

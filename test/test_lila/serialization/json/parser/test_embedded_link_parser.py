@@ -307,7 +307,7 @@ def test_target_media_type(target_media_type):
     assert actual_target_media_type == target_media_type, "Wrong target media type"
 
 
-def test_parse():
+def test_parse(component_validator):
     """Test that data of embedded link is properly parsed.
 
     1. Create an embedded link.
@@ -332,18 +332,4 @@ def test_parse():
     parser.parse_target_media_type = lambda: embedded_link.target_media_type
 
     actual_embedded_link = parser.parse()
-    assert actual_embedded_link.relations == embedded_link.relations, (
-        "Relations of embedded link are not properly parsed"
-        )
-    assert actual_embedded_link.classes == embedded_link.classes, (
-        "Classes of embedded link are not properly parsed"
-        )
-    assert actual_embedded_link.target == embedded_link.target, (
-        "Target of embedded link is not properly parsed"
-        )
-    assert actual_embedded_link.title == embedded_link.title, (
-        "Title of embedded link is not properly parsed"
-        )
-    assert actual_embedded_link.target_media_type == embedded_link.target_media_type, (
-        "Target media type of embedded link is not properly parsed"
-        )
+    component_validator.validate_embedded_link(actual_embedded_link, embedded_link)

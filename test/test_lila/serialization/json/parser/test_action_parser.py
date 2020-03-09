@@ -448,7 +448,7 @@ def test_encoding_type(encoding_type, parsed_fields, expected_encoding_type):
     assert actual_encoding_type == expected_encoding_type, "Wrong encoding type"
 
 
-def test_parse():
+def test_parse(component_validator):
     """Test that action data is properly parsed.
 
     1. Create an action.
@@ -477,12 +477,4 @@ def test_parse():
     parser.parse_fields = lambda: action.fields
 
     actual_action = parser.parse()
-    assert actual_action.name == action.name, "Action name is not properly parsed"
-    assert actual_action.classes == action.classes, "Action classes are not properly parsed"
-    assert actual_action.method == action.method, "Action method is not properly parsed"
-    assert actual_action.target == action.target, "Action target is not properly parsed"
-    assert actual_action.title == action.title, "Action title is not properly parsed"
-    assert actual_action.encoding_type == action.encoding_type, (
-        "Action encoding type is not properly parsed"
-        )
-    assert actual_action.fields == action.fields, "Action fields are not properly parsed"
+    component_validator.validate_action(actual_action, action)

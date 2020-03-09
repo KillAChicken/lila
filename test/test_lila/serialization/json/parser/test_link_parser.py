@@ -293,7 +293,7 @@ def test_target_media_type(target_media_type):
     assert actual_target_media_type == target_media_type, "Wrong target media type"
 
 
-def test_parse():
+def test_parse(component_validator):
     """Test that link data is properly parsed.
 
     1. Create a link.
@@ -318,10 +318,4 @@ def test_parse():
     parser.parse_target_media_type = lambda: link.target_media_type
 
     actual_link = parser.parse()
-    assert actual_link.relations == link.relations, "Link relations are not properly parsed"
-    assert actual_link.classes == link.classes, "Link classes are not properly parsed"
-    assert actual_link.target == link.target, "Link target is not properly parsed"
-    assert actual_link.title == link.title, "Link title is not properly parsed"
-    assert actual_link.target_media_type == link.target_media_type, (
-        "Link target media type is not properly parsed"
-        )
+    component_validator.validate_link(actual_link, link)

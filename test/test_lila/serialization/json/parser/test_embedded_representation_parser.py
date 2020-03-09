@@ -610,7 +610,7 @@ def test_title(title, expected_title):
     assert actual_title == expected_title, "Wrong title"
 
 
-def test_parse():
+def test_parse(component_validator):
     """Test that data of embedded representation is properly parsed.
 
     1. Create an embedded representation.
@@ -642,24 +642,4 @@ def test_parse():
     parser.parse_title = lambda: representation.title
 
     actual_representation = parser.parse()
-    assert actual_representation.relations == representation.relations, (
-        "Relations of the embedded representation are not properly parsed"
-        )
-    assert actual_representation.classes == representation.classes, (
-        "Classes of the embedded representation are not properly parsed"
-        )
-    assert actual_representation.properties == representation.properties, (
-        "Properties of the embedded representation are not properly parsed"
-        )
-    assert actual_representation.title == representation.title, (
-        "Title of the embedded representation is not properly parsed"
-        )
-    assert actual_representation.entities == representation.entities, (
-        "Sub-entities of the embedded representation are not properly parsed"
-        )
-    assert actual_representation.links == representation.links, (
-        "Links of the embedded representation are not properly parsed"
-        )
-    assert actual_representation.actions == representation.actions, (
-        "Actions of the embedded representation are not properly parsed"
-        )
+    component_validator.validate_embedded_representation(actual_representation, representation)

@@ -286,7 +286,7 @@ def test_title(title, expected_title):
     assert actual_title == expected_title, "Wrong title"
 
 
-def test_parse():
+def test_parse(component_validator):
     """Test that field data is properly parsed.
 
     1. Create a field.
@@ -311,8 +311,4 @@ def test_parse():
     parser.parse_title = lambda: field.title
 
     actual_field = parser.parse()
-    assert actual_field.name == field.name, "Field name is not properly parsed"
-    assert actual_field.classes == field.classes, "Field classes are not properly parsed"
-    assert actual_field.input_type == field.input_type, "Field input type is not properly parsed"
-    assert actual_field.value == field.value, "Field value is not properly parsed"
-    assert actual_field.title == field.title, "Field title is not properly parsed"
+    component_validator.validate_field(actual_field, field)
