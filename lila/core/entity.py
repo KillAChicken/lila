@@ -23,6 +23,10 @@ class Entity(Component):
 
         if any(not isinstance(action, Action) for action in actions):
             raise ValueError("Some of the actions are of incompatible type")
+
+        if len(set(action.name for action in actions)) != len(actions):
+            raise ValueError("Some of the actions have the same name")
+
         self._actions = tuple(actions)
 
         if any(not isinstance(entity, (EmbeddedLink, EmbeddedRepresentation)) for entity in entities):  # pylint: disable=line-too-long

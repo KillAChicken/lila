@@ -45,6 +45,10 @@ class Action(Component):
 
         if any(not isinstance(field, Field) for field in fields):
             raise ValueError("Some of the fields are of incompatible type")
+
+        if len(set(field.name for field in fields)) != len(fields):
+            raise ValueError("Some of the fields have the same name")
+
         self._fields = tuple(fields)
 
         if encoding_type is not None:

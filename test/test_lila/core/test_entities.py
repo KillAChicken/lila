@@ -293,6 +293,26 @@ def test_incompatible_actions(actions):
     assert error_info.value.args[0] == "Some of the actions are of incompatible type"
 
 
+def test_duplicated_action_names():
+    """Check that ValueError is raised if some of the actions have the same name.
+
+    1. Create 2 actions with the same name.
+    1. Try to create an entity with the created actions.
+    2. Check that ValueError is raised.
+    3. Check the error message.
+    """
+    actions = [
+        Action(name="duplicate", target="/first", title="First action with non-unique name"),
+        Action(name="unique", target="/second", title="Action with unique name"),
+        Action(name="duplicate", target="/third", title="Second action with non-unique name"),
+        ]
+
+    with pytest.raises(ValueError) as error_info:
+        Entity(actions=actions)
+
+    assert error_info.value.args[0] == "Some of the actions have the same name", "Wrong error"
+
+
 @pytest.mark.parametrize(
     argnames="entities",
     argvalues=[

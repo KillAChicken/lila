@@ -257,6 +257,26 @@ def test_incompatible_fields(fields):
     assert error_info.value.args[0] == "Some of the fields are of incompatible type"
 
 
+def test_duplicated_field_names():
+    """Check that ValueError is raised if some of the fields have the same name.
+
+    1. Create 2 fields with the same name.
+    1. Try to create an action with the created fields.
+    2. Check that ValueError is raised.
+    3. Check the error message.
+    """
+    fields = [
+        Field(name="duplicate", title="First field with non-unique name"),
+        Field(name="unique", title="Field with unique name"),
+        Field(name="duplicate", title="Second field with non-unique name"),
+        ]
+
+    with pytest.raises(ValueError) as error_info:
+        Action(name="test duplicate fields", target="/test/duplicate/fields", fields=fields)
+
+    assert error_info.value.args[0] == "Some of the fields have the same name", "Wrong error"
+
+
 @pytest.mark.parametrize(
     argnames="encoding_type",
     argvalues=[
