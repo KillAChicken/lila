@@ -484,6 +484,26 @@ def test_title(title, expected_title):
     assert actual_title == expected_title, "Wrong title"
 
 
+def test_entity_creation_error():
+    """Test that ValueError is raised if an error occurs during entity creation.
+
+    1. Create an entity parser.
+    2. Replace parse_classes method so that it returns invalid classes.
+    3. Try to call parse method.
+    4. Check that ValueError is raised.
+    5. Check the error message.
+    """
+    parser = EntityParser(data={}, parser=JSONParser())
+    parser.parse_classes = lambda: 1
+
+    with pytest.raises(ValueError) as error_info:
+        parser.parse()
+
+    assert error_info.value.args[0] == "Failed to create an entity with provided data", (
+        "Wrong error"
+        )
+
+
 def test_parse(component_validator):
     """Test that entity data is properly parsed.
 

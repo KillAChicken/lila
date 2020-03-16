@@ -17,13 +17,19 @@ class LinkMarshaler:
         :returns: dictionary with link data.
         :raises: :class:ValueError.
         """
-        return {
+        logger = logging.getLogger(__name__)
+        logger.debug("Try to marshal a link")
+
+        link_data = {
             "rel": self.marshal_relations(),
             "class": self.marshal_classes(),
             "href": self.marshal_target(),
             "title": self.marshal_title(),
             "type": self.marshal_target_media_type(),
             }
+
+        logger.info("Successfully marshaled a link")
+        return link_data
 
     def marshal_relations(self):
         """Marshal link's relations.
@@ -129,13 +135,19 @@ class EmbeddedLinkMarshaler:
         :returns: dictionary with data of the embedded link.
         :raises: :class:ValueError.
         """
-        return {
+        logger = logging.getLogger(__name__)
+        logger.debug("Try to marshal an embedded link")
+
+        embedded_link_data = {
             "rel": self.marshal_relations(),
             "class": self.marshal_classes(),
             "href": self.marshal_target(),
             "title": self.marshal_title(),
             "type": self.marshal_target_media_type(),
             }
+
+        logger.info("Successfully marshaled an embedded link")
+        return embedded_link_data
 
     def marshal_relations(self):
         """Marshal relations of the embedded link.
@@ -241,14 +253,32 @@ class LinkParser:
         """Parse the link.
 
         :returns: :class:`Link <lila.core.link.Link>`.
+        :raises: :class:ValueError.
         """
-        return Link(
-            relations=self.parse_relations(),
-            classes=self.parse_classes(),
-            target=self.parse_target(),
-            title=self.parse_title(),
-            target_media_type=self.parse_target_media_type(),
-            )
+        logger = logging.getLogger(__name__)
+        logger.debug("Try to parse a link")
+
+        link_relations = self.parse_relations()
+        link_classes = self.parse_classes()
+        link_target = self.parse_target()
+        link_title = self.parse_title()
+        link_target_media_type = self.parse_target_media_type()
+
+        try:
+            link = Link(
+                relations=link_relations,
+                classes=link_classes,
+                target=link_target,
+                title=link_title,
+                target_media_type=link_target_media_type,
+                )
+        except Exception as error:
+            logger.error("Failed to create a link with provided data")
+            raise ValueError("Failed to create a link with provided data") from error
+        else:
+            logger.info("Successfully parsed a link")
+
+        return link
 
     def parse_relations(self):
         """Parse link's relations.
@@ -370,14 +400,32 @@ class EmbeddedLinkParser:
         """Parse the embedded link.
 
         :returns: :class:`EmbeddedLink <lila.core.link.Link>`.
+        :raises: :class:ValueError.
         """
-        return EmbeddedLink(
-            relations=self.parse_relations(),
-            classes=self.parse_classes(),
-            target=self.parse_target(),
-            title=self.parse_title(),
-            target_media_type=self.parse_target_media_type(),
-            )
+        logger = logging.getLogger(__name__)
+        logger.debug("Try to parse an embedded link")
+
+        embedded_link_relations = self.parse_relations()
+        embedded_link_classes = self.parse_classes()
+        embedded_link_target = self.parse_target()
+        embedded_link_title = self.parse_title()
+        embedded_link_target_media_type = self.parse_target_media_type()
+
+        try:
+            embedded_link = EmbeddedLink(
+                relations=embedded_link_relations,
+                classes=embedded_link_classes,
+                target=embedded_link_target,
+                title=embedded_link_title,
+                target_media_type=embedded_link_target_media_type,
+                )
+        except Exception as error:
+            logger.error("Failed to create an embedded link with provided data")
+            raise ValueError("Failed to create an embedded link with provided data") from error
+        else:
+            logger.info("Successfully parsed an embedded link")
+
+        return embedded_link
 
     def parse_relations(self):
         """Parse relations of the embedded link.

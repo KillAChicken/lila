@@ -19,7 +19,10 @@ class EntityMarshaler:
         :returns: dictionary with entity data.
         :raises: :class:ValueError.
         """
-        return {
+        logger = logging.getLogger(__name__)
+        logger.debug("Try to marshal an entity")
+
+        entity_data = {
             "class": self.marshal_classes(),
             "properties": self.marshal_properties(),
             "entities": self.marshal_entities(),
@@ -27,6 +30,9 @@ class EntityMarshaler:
             "actions": self.marshal_actions(),
             "title": self.marshal_title(),
             }
+
+        logger.info("Successfully marshaled an entity")
+        return entity_data
 
     def marshal_classes(self):
         """Marshal entity's classes.
@@ -196,7 +202,10 @@ class EmbeddedRepresentationMarshaler:
         :returns: dictionary with entity data.
         :raises: :class:ValueError.
         """
-        return {
+        logger = logging.getLogger(__name__)
+        logger.debug("Try to marshal an embeddded representation")
+
+        representation_data = {
             "rel": self.marshal_relations(),
             "class": self.marshal_classes(),
             "properties": self.marshal_properties(),
@@ -205,6 +214,9 @@ class EmbeddedRepresentationMarshaler:
             "actions": self.marshal_actions(),
             "title": self.marshal_title(),
             }
+
+        logger.info("Successfully marshaled an embedded representation")
+        return representation_data
 
     def marshal_relations(self):
         """Marshal relations of the embedded representation.
@@ -411,15 +423,34 @@ class EntityParser:
         """Parse the entity.
 
         :returns: :class:`Entity <lila.core.entity.Entity>`.
+        :raises: :class:ValueError.
         """
-        return Entity(
-            classes=self.parse_classes(),
-            properties=self.parse_properties(),
-            entities=self.parse_entities(),
-            links=self.parse_links(),
-            actions=self.parse_actions(),
-            title=self.parse_title(),
-            )
+        logger = logging.getLogger(__name__)
+        logger.debug("Try to parse an entity")
+
+        entity_classes = self.parse_classes()
+        entity_properties = self.parse_properties()
+        entity_entities = self.parse_entities()
+        entity_links = self.parse_links()
+        entity_actions = self.parse_actions()
+        entity_title = self.parse_title()
+
+        try:
+            entity = Entity(
+                classes=entity_classes,
+                properties=entity_properties,
+                entities=entity_entities,
+                links=entity_links,
+                actions=entity_actions,
+                title=entity_title,
+                )
+        except Exception as error:
+            logger.error("Failed to create an entity with provided data")
+            raise ValueError("Failed to create an entity with provided data") from error
+        else:
+            logger.info("Successfully parsed an entity")
+
+        return entity
 
     def parse_classes(self):
         """Parse entity's classes.
@@ -611,16 +642,38 @@ class EmbeddedRepresentationParser:
         """Parse the embedded representation.
 
         :returns: :class:`EmbeddedRepresentation <lila.core.entity.EmbeddedRepresentation>`.
+        :raises: :class:ValueError.
         """
-        return EmbeddedRepresentation(
-            relations=self.parse_relations(),
-            classes=self.parse_classes(),
-            properties=self.parse_properties(),
-            entities=self.parse_entities(),
-            links=self.parse_links(),
-            actions=self.parse_actions(),
-            title=self.parse_title(),
-            )
+        logger = logging.getLogger(__name__)
+        logger.debug("Try to parse an embedded representation")
+
+        representation_relations = self.parse_relations()
+        representation_classes = self.parse_classes()
+        representation_properties = self.parse_properties()
+        representation_entities = self.parse_entities()
+        representation_links = self.parse_links()
+        representation_actions = self.parse_actions()
+        representation_title = self.parse_title()
+
+        try:
+            representation = EmbeddedRepresentation(
+                relations=representation_relations,
+                classes=representation_classes,
+                properties=representation_properties,
+                entities=representation_entities,
+                links=representation_links,
+                actions=representation_actions,
+                title=representation_title,
+                )
+        except Exception as error:
+            logger.error("Failed to create an embedded representation with provided data")
+            raise ValueError(
+                "Failed to create an embedded representation with provided data",
+                ) from error
+        else:
+            logger.info("Successfully parsed an embedded representation")
+
+        return representation
 
     def parse_relations(self):
         """Parse relations of the embedded representation.

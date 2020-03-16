@@ -293,6 +293,28 @@ def test_target_media_type(target_media_type):
     assert actual_target_media_type == target_media_type, "Wrong target media type"
 
 
+def test_link_creation_error():
+    """Test that ValueError is raised if an error occurs during link creation.
+
+    1. Create a link parser.
+    2. Replace parse_classes method so that it returns invalid object for classes.
+    3. Try to call parse method.
+    4. Check that ValueError is raised.
+    5. Check the error message.
+    """
+    link_data = {
+        "rel": ["link relation 1"],
+        "href": "/target",
+        }
+    parser = LinkParser(data=link_data)
+    parser.parse_classes = lambda: 1
+
+    with pytest.raises(ValueError) as error_info:
+        parser.parse()
+
+    assert error_info.value.args[0] == "Failed to create a link with provided data", "Wrong error"
+
+
 def test_parse(component_validator):
     """Test that link data is properly parsed.
 

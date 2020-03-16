@@ -448,6 +448,31 @@ def test_encoding_type(encoding_type, parsed_fields, expected_encoding_type):
     assert actual_encoding_type == expected_encoding_type, "Wrong encoding type"
 
 
+def test_action_creation_error():
+    """Test that ValueError is raised if an error occurs during action creation.
+
+    1. Create an action parser.
+    2. Replace parse_method method so that it returns invalid method.
+    3. Try to call parse method.
+    4. Check that ValueError is raised.
+    5. Check the error message.
+    """
+    action_data = {
+        "name": "name",
+        "classes": [],
+        "href": "/target",
+        }
+    parser = ActionParser(data=action_data, parser=JSONParser())
+    parser.parse_method = lambda: "invalid method"
+
+    with pytest.raises(ValueError) as error_info:
+        parser.parse()
+
+    assert error_info.value.args[0] == "Failed to create an action with provided data", (
+        "Wrong error"
+        )
+
+
 def test_parse(component_validator):
     """Test that action data is properly parsed.
 

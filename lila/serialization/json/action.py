@@ -18,7 +18,10 @@ class ActionMarshaler:
         :returns: dictionary with action data.
         :raises: :class:ValueError.
         """
-        return {
+        logger = logging.getLogger(__name__)
+        logger.debug("Try to marshal an action")
+
+        action_data = {
             "name": self.marshal_name(),
             "class": self.marshal_classes(),
             "method": self.marshal_method(),
@@ -27,6 +30,9 @@ class ActionMarshaler:
             "type": self.marshal_encoding_type(),
             "fields": self.marshal_fields(),
             }
+
+        logger.info("Successfully marshaled an action")
+        return action_data
 
     def marshal_name(self):
         """Marshal action's name.
@@ -181,16 +187,36 @@ class ActionParser:
         """Parse an action from the data.
 
         :returns: :class:`Action <lila.core.action.Action>`.
+        :raises: :class:ValueError.
         """
-        return Action(
-            name=self.parse_name(),
-            classes=self.parse_classes(),
-            method=self.parse_method(),
-            target=self.parse_target(),
-            title=self.parse_title(),
-            encoding_type=self.parse_encoding_type(),
-            fields=self.parse_fields(),
-            )
+        logger = logging.getLogger(__name__)
+        logger.debug("Try to parse an action")
+
+        action_name = self.parse_name()
+        action_classes = self.parse_classes()
+        action_method = self.parse_method()
+        action_target = self.parse_target()
+        action_title = self.parse_title()
+        action_encoding_type = self.parse_encoding_type()
+        action_fields = self.parse_fields()
+
+        try:
+            action = Action(
+                name=action_name,
+                classes=action_classes,
+                method=action_method,
+                target=action_target,
+                title=action_title,
+                encoding_type=action_encoding_type,
+                fields=action_fields,
+                )
+        except Exception as error:
+            logger.error("Failed to create an action with provided data")
+            raise ValueError("Failed to create an action with provided data") from error
+        else:
+            logger.info("Successfully parsed an action")
+
+        return action
 
     def parse_name(self):
         """Parse action's name.

@@ -286,6 +286,28 @@ def test_title(title, expected_title):
     assert actual_title == expected_title, "Wrong title"
 
 
+def test_field_creation_error():
+    """Test that ValueError is raised if an error occurs during field creation.
+
+    1. Create a field parser.
+    2. Replace parse_input_type method so that it returns invalid input type.
+    3. Try to call parse method.
+    4. Check that ValueError is raised.
+    5. Check the error message.
+    """
+    field_data = {
+        "name": "name",
+        "classes": [],
+        }
+    parser = FieldParser(data=field_data)
+    parser.parse_input_type = lambda: "invalid input type"
+
+    with pytest.raises(ValueError) as error_info:
+        parser.parse()
+
+    assert error_info.value.args[0] == "Failed to create a field with provided data", "Wrong error"
+
+
 def test_parse(component_validator):
     """Test that field data is properly parsed.
 

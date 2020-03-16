@@ -16,13 +16,19 @@ class FieldMarshaler:
 
         :returns: dictionary with field data.
         """
-        return {
+        logger = logging.getLogger(__name__)
+        logger.debug("Try to marshal a field")
+
+        field_data = {
             "name": self.marshal_name(),
             "class": self.marshal_classes(),
             "type": self.marshal_input_type(),
             "value": self.marshal_value(),
             "title": self.marshal_title(),
             }
+
+        logger.info("Successfully marshaled a field")
+        return field_data
 
     def marshal_name(self):
         """Marshal field's name.
@@ -129,14 +135,32 @@ class FieldParser:
         """Parse a field from the data.
 
         :returns: :class:`Field <lila.core.field.Field>`.
+        :raises: :class:ValueError.
         """
-        return Field(
-            name=self.parse_name(),
-            classes=self.parse_classes(),
-            input_type=self.parse_input_type(),
-            value=self.parse_value(),
-            title=self.parse_title(),
-            )
+        logger = logging.getLogger(__name__)
+        logger.debug("Try to parse a field")
+
+        field_name = self.parse_name()
+        field_classes = self.parse_classes()
+        field_input_type = self.parse_input_type()
+        field_value = self.parse_value()
+        field_title = self.parse_title()
+
+        try:
+            field = Field(
+                name=field_name,
+                classes=field_classes,
+                input_type=field_input_type,
+                value=field_value,
+                title=field_title,
+                )
+        except Exception as error:
+            logger.error("Failed to create a field with provided data")
+            raise ValueError("Failed to create a field with provided data") from error
+        else:
+            logger.info("Successfully parsed a field")
+
+        return field
 
     def parse_name(self):
         """Parse field's name.

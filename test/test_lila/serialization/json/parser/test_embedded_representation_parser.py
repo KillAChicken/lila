@@ -610,6 +610,25 @@ def test_title(title, expected_title):
     assert actual_title == expected_title, "Wrong title"
 
 
+def test_embedded_representation_creation_error():
+    """Test that ValueError is raised if an error occurs during embedded representation creation.
+
+    1. Create an embedded representation parser.
+    2. Replace parse_relations method so that it returns invalid classes.
+    3. Try to call parse method.
+    4. Check that ValueError is raised.
+    5. Check the error message.
+    """
+    parser = EmbeddedRepresentationParser(data={}, parser=JSONParser())
+    parser.parse_relations = lambda: 1
+
+    with pytest.raises(ValueError) as error_info:
+        parser.parse()
+
+    expected_message = "Failed to create an embedded representation with provided data"
+    assert error_info.value.args[0] == expected_message, "Wrong error"
+
+
 def test_parse(component_validator):
     """Test that data of embedded representation is properly parsed.
 
