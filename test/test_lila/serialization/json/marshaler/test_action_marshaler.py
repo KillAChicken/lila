@@ -261,23 +261,23 @@ def test_title(title, expected_title):
     assert actual_title == expected_title, "Wrong title"
 
 
-def test_missing_encoding_type():
-    """Test that ValueError is raised if an action does not have encoding type attribute.
+def test_missing_media_type():
+    """Test that ValueError is raised if an action does not have media type attribute.
 
-    1. Create an action marshaler for an object without encoding type attibute.
-    2. Try to call marshal_encoding_type method.
+    1. Create an action marshaler for an object without media type attibute.
+    2. Try to call marshal_media_type method.
     3. Check that ValueError is raised.
     4. Check the error message.
     """
     marshaler = ActionMarshaler(marshaler=JSONMarshaler(), action=object())
     with pytest.raises(ValueError) as error_info:
-        marshaler.marshal_encoding_type()
+        marshaler.marshal_media_type()
 
-    assert error_info.value.args[0] == "Failed to get action's encoding type", "Wrong error"
+    assert error_info.value.args[0] == "Failed to get action's media type", "Wrong error"
 
 
 @pytest.mark.parametrize(
-    argnames="encoding_type,expected_encoding_type",
+    argnames="media_type,expected_media_type",
     argvalues=[
         ("application/x-www-form-urlencoded", "application/x-www-form-urlencoded"),
         (None, None),
@@ -287,21 +287,21 @@ def test_missing_encoding_type():
         "None",
         ],
     )
-def test_encoding_type(encoding_type, expected_encoding_type):
-    """Test that encoding type is properly marshaled.
+def test_media_type(media_type, expected_media_type):
+    """Test that media type is properly marshaled.
 
-    1. Create an action marshaler for an object with specific encoding type.
-    2. Marshal action's encoding type.
-    3. Check the marshaled encoding type.
+    1. Create an action marshaler for an object with specific media type.
+    2. Marshal action's media type.
+    3. Check the marshaled media type.
     """
-    EncodingTypeAction = namedtuple("EncodingTypeAction", "encoding_type")
+    MediaTypeAction = namedtuple("MediaTypeAction", "media_type")
     marshaler = ActionMarshaler(
         marshaler=JSONMarshaler(),
-        action=EncodingTypeAction(encoding_type=encoding_type),
+        action=MediaTypeAction(media_type=media_type),
         )
 
-    actual_encoding_type = marshaler.marshal_encoding_type()
-    assert actual_encoding_type == expected_encoding_type, "Wrong encoding type"
+    actual_media_type = marshaler.marshal_media_type()
+    assert actual_media_type == expected_media_type, "Wrong media type"
 
 
 def test_missing_fields():
@@ -409,7 +409,7 @@ def test_marshal():
     marshaler.marshal_method = lambda: "marshal_method"
     marshaler.marshal_target = lambda: "marshal_target"
     marshaler.marshal_title = lambda: "marshal_title"
-    marshaler.marshal_encoding_type = lambda: "marshal_encoding_type"
+    marshaler.marshal_media_type = lambda: "marshal_media_type"
     marshaler.marshal_fields = lambda: "marshal_fields"
 
     actual_data = marshaler.marshal()
@@ -419,7 +419,7 @@ def test_marshal():
         "method": "marshal_method",
         "href": "marshal_target",
         "title": "marshal_title",
-        "type": "marshal_encoding_type",
+        "type": "marshal_media_type",
         "fields": "marshal_fields",
         }
     assert actual_data == expected_data, "Action is not properly marshaled"

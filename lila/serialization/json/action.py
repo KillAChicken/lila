@@ -27,7 +27,7 @@ class ActionMarshaler:
             "method": self.marshal_method(),
             "href": self.marshal_target(),
             "title": self.marshal_title(),
-            "type": self.marshal_encoding_type(),
+            "type": self.marshal_media_type(),
             "fields": self.marshal_fields(),
             }
 
@@ -125,23 +125,23 @@ class ActionMarshaler:
 
         return title
 
-    def marshal_encoding_type(self):
-        """Marshal action's encoding type.
+    def marshal_media_type(self):
+        """Marshal action's media type.
 
-        :returns: string value of action's encoding type or None.
+        :returns: string value of action's media type or None.
         :raises: :class:ValueError.
         """
         action = self._action
         try:
-            encoding_type = action.encoding_type
+            media_type = action.media_type
         except AttributeError as error:
-            logging.getLogger(__name__).error("Failed to get action's encoding type")
-            raise ValueError("Failed to get action's encoding type") from error
+            logging.getLogger(__name__).error("Failed to get action's media type")
+            raise ValueError("Failed to get action's media type") from error
 
-        if encoding_type is not None:
-            encoding_type = str(encoding_type)
+        if media_type is not None:
+            media_type = str(media_type)
 
-        return encoding_type
+        return media_type
 
     def marshal_fields(self):
         """Marshal action's fields.
@@ -197,7 +197,7 @@ class ActionParser:
         action_method = self.parse_method()
         action_target = self.parse_target()
         action_title = self.parse_title()
-        action_encoding_type = self.parse_encoding_type()
+        action_media_type = self.parse_media_type()
         action_fields = self.parse_fields()
 
         try:
@@ -207,7 +207,7 @@ class ActionParser:
                 method=action_method,
                 target=action_target,
                 title=action_title,
-                encoding_type=action_encoding_type,
+                media_type=action_media_type,
                 fields=action_fields,
                 )
         except Exception as error:
@@ -325,28 +325,28 @@ class ActionParser:
 
         return action_title
 
-    def parse_encoding_type(self):
-        """Parse action's encoding type.
+    def parse_media_type(self):
+        """Parse action's media type.
 
-        :returns: string value of action's encoding type or None.
+        :returns: string value of action's media type or None.
         :raises: :class:ValueError.
         """
         logger = logging.getLogger(__name__)
 
         try:
-            action_encoding_type = self._data["type"]
+            action_media_type = self._data["type"]
         except TypeError as error:
-            logger.error("Failed to get encoding type from action data")
-            raise ValueError("Failed to get encoding type from action data") from error
+            logger.error("Failed to get media type from action data")
+            raise ValueError("Failed to get media type from action data") from error
         except KeyError:
-            action_encoding_type = None
+            action_media_type = None
 
-        if action_encoding_type is not None:
-            action_encoding_type = str(action_encoding_type)
+        if action_media_type is not None:
+            action_media_type = str(action_media_type)
         elif self.parse_fields():
-            action_encoding_type = "application/x-www-form-urlencoded"
+            action_media_type = "application/x-www-form-urlencoded"
 
-        return action_encoding_type
+        return action_media_type
 
     def parse_fields(self):
         """Parse action's fields.

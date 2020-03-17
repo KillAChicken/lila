@@ -378,22 +378,22 @@ def test_fields(fields_data):
     assert actual_fields == tuple(range(len(fields_data))), "Wrong fields"
 
 
-def test_unobtainable_encoding_type():
-    """Test that ValueError is raised if encoding type can't be retrieved from action data.
+def test_unobtainable_media_type():
+    """Test that ValueError is raised if media type can't be retrieved from action data.
 
     1. Create an action parser for a non-subscriptable object.
-    2. Try to call parse_encoding_type method.
+    2. Try to call parse_media_type method.
     3. Check that ValueError is raised.
     4. Check the error message.
     """
     with pytest.raises(ValueError) as error_info:
-        ActionParser(data=None, parser=JSONParser()).parse_encoding_type()
+        ActionParser(data=None, parser=JSONParser()).parse_media_type()
 
-    assert error_info.value.args[0] == "Failed to get encoding type from action data", "Wrong error"
+    assert error_info.value.args[0] == "Failed to get media type from action data", "Wrong error"
 
 
 @pytest.mark.parametrize(
-    argnames="parsed_fields,expected_encoding_type",
+    argnames="parsed_fields,expected_media_type",
     argvalues=[
         [(), None],
         [(Field(name="name"), ), "application/x-www-form-urlencoded"],
@@ -403,23 +403,23 @@ def test_unobtainable_encoding_type():
         "With fields",
         ],
     )
-def test_missing_encoding_type(parsed_fields, expected_encoding_type):
+def test_missing_media_type(parsed_fields, expected_media_type):
     """Test that None is returned if action data don't have 'type' key.
 
-    1. Create an action parser for a dictionary without encoding type.
+    1. Create an action parser for a dictionary without media type.
     2. Replace parse_fields of the parser so that it returns predefined parsed fields.
-    3. Parse encoding type.
+    3. Parse media type.
     3. Check that default value is returned.
     """
     parser = ActionParser(data={}, parser=JSONParser())
     parser.parse_fields = lambda: parsed_fields
 
-    actual_encoding_type = parser.parse_encoding_type()
-    assert actual_encoding_type == expected_encoding_type, "Wrong encoding type"
+    actual_media_type = parser.parse_media_type()
+    assert actual_media_type == expected_media_type, "Wrong media type"
 
 
 @pytest.mark.parametrize(
-    argnames="encoding_type,parsed_fields,expected_encoding_type",
+    argnames="media_type,parsed_fields,expected_media_type",
     argvalues=[
         ("application/json", (), "application/json"),
         ("application/json", (Field(name="name"), ), "application/json"),
@@ -433,19 +433,19 @@ def test_missing_encoding_type(parsed_fields, expected_encoding_type):
         "None type with fields",
         ],
     )
-def test_encoding_type(encoding_type, parsed_fields, expected_encoding_type):
-    """Test that encoding type is properly parsed.
+def test_media_type(media_type, parsed_fields, expected_media_type):
+    """Test that media type is properly parsed.
 
-    1. Create an action parser for a dictionary with specific encoding type.
+    1. Create an action parser for a dictionary with specific media type.
     2. Replace parse_fields of the parser so that it returns predefined parsed fields.
-    3. Parse encoding type.
-    3. Check parsed encoding type.
+    3. Parse media type.
+    3. Check parsed media type.
     """
-    parser = ActionParser(data={"type": encoding_type}, parser=JSONParser())
+    parser = ActionParser(data={"type": media_type}, parser=JSONParser())
     parser.parse_fields = lambda: parsed_fields
 
-    actual_encoding_type = parser.parse_encoding_type()
-    assert actual_encoding_type == expected_encoding_type, "Wrong encoding type"
+    actual_media_type = parser.parse_media_type()
+    assert actual_media_type == expected_media_type, "Wrong media type"
 
 
 def test_action_creation_error():
@@ -488,7 +488,7 @@ def test_parse(component_validator):
         method=Method.PUT,
         target="/parsed/target",
         title="parsed title",
-        encoding_type="application/parsed+type",
+        media_type="application/parsed+type",
         fields=(Field(name="first"), Field(name="second")),
         )
 
@@ -498,7 +498,7 @@ def test_parse(component_validator):
     parser.parse_method = lambda: action.method
     parser.parse_target = lambda: action.target
     parser.parse_title = lambda: action.title
-    parser.parse_encoding_type = lambda: action.encoding_type
+    parser.parse_media_type = lambda: action.media_type
     parser.parse_fields = lambda: action.fields
 
     actual_action = parser.parse()

@@ -278,7 +278,7 @@ def test_duplicated_field_names():
 
 
 @pytest.mark.parametrize(
-    argnames="encoding_type",
+    argnames="media_type",
     argvalues=[
         None,
         "application/x-www-form-urlencoded",
@@ -290,24 +290,24 @@ def test_duplicated_field_names():
         "Uncommon",
     ],
 )
-def test_encoding_type_without_fields(encoding_type):
-    """Check encoding type of an action without fields.
+def test_media_type_without_fields(media_type):
+    """Check media type of an action without fields.
 
-    1. Create an action with different encoding type without fields.
-    2. Get encoding type of the action.
-    3. Check the encoding type.
+    1. Create an action with different media type without fields.
+    2. Get media type of the action.
+    3. Check the media type.
     """
     action = Action(
-        name="test encoding type. No fields",
-        target="/test-encoding-types",
+        name="test media type. No fields",
+        target="/test-media-types",
         fields=(),
-        encoding_type=encoding_type,
+        media_type=media_type,
         )
-    assert action.encoding_type == encoding_type, "Wrong encoding type"
+    assert action.media_type == media_type, "Wrong media type"
 
 
 @pytest.mark.parametrize(
-    argnames="encoding_type, expected_encoding_type",
+    argnames="media_type, expected_media_type",
     argvalues=[
         (None, "application/x-www-form-urlencoded"),
         ("application/x-www-form-urlencoded", "application/x-www-form-urlencoded"),
@@ -319,24 +319,24 @@ def test_encoding_type_without_fields(encoding_type):
         "Uncommon",
     ],
 )
-def test_encoding_type_with_fields(encoding_type, expected_encoding_type):
-    """Check encoding type of an action with fields.
+def test_media_type_with_fields(media_type, expected_media_type):
+    """Check media type of an action with fields.
 
-    1. Create an action with different encoding type with 1 field.
-    2. Get encoding type of the action.
-    3. Check the encoding type.
+    1. Create an action with different media type with 1 field.
+    2. Get media type of the action.
+    3. Check the media type.
     """
     action = Action(
-        name="test encoding type. No fields",
-        target="/test-encoding-types",
+        name="test media type. No fields",
+        target="/test-media-types",
         fields=[Field(name="single field")],
-        encoding_type=encoding_type,
+        media_type=media_type,
         )
-    assert action.encoding_type == expected_encoding_type, "Wrong encoding type"
+    assert action.media_type == expected_media_type, "Wrong media type"
 
 
 @pytest.mark.parametrize(
-    argnames="fields, expected_encoding_type",
+    argnames="fields, expected_media_type",
     argvalues=[
         [(), None],
         [[Field(name="field")], "application/x-www-form-urlencoded"],
@@ -346,16 +346,16 @@ def test_encoding_type_with_fields(encoding_type, expected_encoding_type):
         "With fields",
     ],
 )
-def test_default_encoding_type(fields, expected_encoding_type):
+def test_default_media_type(fields, expected_media_type):
     """Check default enconding type of an action.
 
-    1. Create an action without specifying encoding type.
-    2. Get encoding type of the action.
-    3. Check the encoding type.
+    1. Create an action without specifying media type.
+    2. Get media type of the action.
+    3. Check the media type.
     """
     action = Action(
-        name="test default encoding type",
-        target="/test-default-encoding-type",
+        name="test default media type",
+        target="/test-default-media-type",
         fields=fields,
         )
-    assert action.encoding_type == expected_encoding_type, "Wrong encoding type"
+    assert action.media_type == expected_media_type, "Wrong media type"

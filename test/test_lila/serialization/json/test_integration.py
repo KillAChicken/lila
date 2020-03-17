@@ -48,7 +48,7 @@ def test_action(component_validator):
         method=random.choice(list(Method)),
         target="/action/target",
         title="action title",
-        encoding_type="application/action",
+        media_type="application/json",
         fields=(
             Field(name="first"),
             Field(name="second")

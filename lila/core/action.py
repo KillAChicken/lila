@@ -30,7 +30,7 @@ class Action(Component):
             method=Method.GET,
             title=None,
             fields=(),
-            encoding_type=None,
+            media_type=None,
         ):
         # pylint: disable=too-many-arguments
         super(Action, self).__init__(classes=classes, title=title)
@@ -51,11 +51,11 @@ class Action(Component):
 
         self._fields = tuple(fields)
 
-        if encoding_type is not None:
-            encoding_type = str(encoding_type)
+        if media_type is not None:
+            media_type = str(media_type)
         elif self._fields:
-            encoding_type = "application/x-www-form-urlencoded"
-        self._encoding_type = encoding_type
+            media_type = "application/x-www-form-urlencoded"
+        self._media_type = media_type
 
     @property
     def name(self):
@@ -78,6 +78,6 @@ class Action(Component):
         return tuple(self._fields)
 
     @property
-    def encoding_type(self):
-        """Type for the request."""
-        return self._encoding_type
+    def media_type(self):
+        """Media type of action's payload."""
+        return self._media_type

@@ -34,9 +34,7 @@ class _ComponentValidator:
         assert action.method == expected_action.method, "Wrong method of the action"
         assert action.target == expected_action.target, "Wrong target of the action"
         assert action.title == expected_action.title, "Wrong title of the action"
-        assert action.encoding_type == expected_action.encoding_type, (
-            "Wrong encoding type of the action"
-            )
+        assert action.media_type == expected_action.media_type, "Wrong media type of the action"
 
         fields = action.fields
         expected_fields = expected_action.fields
