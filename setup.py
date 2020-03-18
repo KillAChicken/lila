@@ -10,7 +10,7 @@ if __name__ == "__main__":
 
     setuptools.setup(
         name="lila",
-        version="0.0.1",
+        version="1.0.0",
         author="KillAChicken",
         author_email="KillAChicken@yandex.ru",
         description="Library to work with Siren protocol",
